@@ -12,13 +12,8 @@ app.use(bodyParser.urlencoded({extended: false}))
 // Process application/json
 app.use(bodyParser.json())
 
-// Spin up the server
-app.listen(app.get('port'), function() {
-	console.log('Express server is running at port', app.get('port'))
-})
-
-
-app.set('port', (process.env.PORT || 5000))
+// Sets server port and logs message on success
+app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 
 
