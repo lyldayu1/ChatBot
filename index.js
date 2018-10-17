@@ -41,16 +41,14 @@ app.post('/webhook/', function (req, res) {
 		  if (err) throw err;
 		  console.log("Connected!");
 		});
-		var sql = "INSERT INTO Orders(UID, Time, Content) VALUES ?";
+		var sql = "INSERT INTO Orders(UID, Time, Content) VALUES(?, ?, ?)";
 		var uid = sender
-		var time = 'now'
+		var time = Date.Now()
 		var txt = text
 		con.query(sql, (uid, time, txt), function(err, result){
 			if(err) throw err;
 			console.log("added");
 		});
-
-
 
 
     }
@@ -81,21 +79,21 @@ function sendTextMessage(sender, text) {
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
-  host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com：3306",
-  user: "lyldayu",
-  password: "ChatBot9",
-  database: "ChatBot"
+	host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com：3306",
+	user: "lyldayu",
+	password: "ChatBot9",
+	database: "ChatBot"
 });
 
 con.connect(function(err) {
-  if (err)
-  {
-  	console.log("ERROR in connection to DB")
-  }
-  else
-  {
-  	  	console.log("Connected!")
+	if (err)
+	{
+		console.log("ERROR in connection to DB")
+	}
+	else
+	{
+		console.log("Connected!")
 
-  }
+	}
 
 });
