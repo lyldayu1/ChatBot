@@ -16,12 +16,12 @@ app.use(bodyParser.json())
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 
-
+  let VERIFY_TOKEN = "yuliangzz"
 // Adds support for GET requests to our webhook
 app.get('/webhook', (req, res) => {
 
   // Your verify token. Should be a random string.
-  let VERIFY_TOKEN = "yuliangzz"
+
     
   // Parse the query params
   let mode = req.query['hub.mode'];
@@ -56,17 +56,16 @@ app.post('/webhook', (req, res) => {
   // Checks this is an event from a page subscription
   if (body.object === 'page') {
 
-    // Iterates over each entry - there may be multiple if batched
-    body.entry.forEach(function(entry) {
-
-      // Gets the message. entry.messaging is an array, but 
-      // will only ever contain one message, so we get index 0
-      let webhook_event = entry.messaging[0];
-      console.log(webhook_event);
-    });
-
-    // Returns a '200 OK' response to all requests
-    res.status(200).send('EVENT_RECEIVED');
+    let messaging_events = req.body.entry[0].messaging
+    for (let i = 0; i < messaging_events.length; i++) {
+      let event = req.body.entry[0].messaging[i]
+      let sender = event.sender.id
+      if (event.message && event.message.text) {
+        let text = event.message.text
+        sendTextMessage(sender, "hello: " + text.substring(0, 200))
+      }
+    }
+    res.sendStatus(200)
   } else {
     // Returns a '404 Not Found' if event is not from a page subscription
     res.sendStatus(404);
@@ -75,24 +74,24 @@ app.post('/webhook', (req, res) => {
 });
 
 
-// function sendTextMessage(sender, text) {
-//     let messageData = { text:text }
-//     request({
-// 	    url: 'https://graph.facebook.com/v2.6/me/messages',
-// 	    qs: {access_token:token},
-// 	    method: 'POST',
-// 		json: {
-// 		    recipient: {id:sender},
-// 			message: messageData,
-// 		}
-// 	}, function(error, response, body) {
-// 		if (error) {
-// 		    console.log('Error sending messages: ', error)
-// 		} else if (response.body.error) {
-// 		    console.log('Error: ', response.body.error)
-// 	    }
-//     })
-// }
+function sendTextMessage(sender, text) {
+    let messageData = { text:text }
+    request({
+	    url: 'https://graph.facebook.com/v2.6/me/messages',
+	    qs: {access_token:VERIFY_TOKEN},
+	    method: 'POST',
+		json: {
+		    recipient: {id:sender},
+			message: messageData,
+		}
+	}, function(error, response, body) {
+		if (error) {
+		    console.log('Error sending messages: ', error)
+		} else if (response.body.error) {
+		    console.log('Error: ', response.body.error)
+	    }
+    })
+}
 
 var mysql = require('mysql');
 
