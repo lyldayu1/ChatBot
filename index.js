@@ -4,7 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const request = require('request')
 const app = express()
-const token = "EAAFV4wUyJZAwBAC9ZANzbez1SqUeQ3a3K9gDyI6SSkxrlhyct42oNCcDE3W4yUPDTQYjqV5AXDfe9IHePmPzZBwC4LRHHQrtbzH1wvCzf1ahXNT5cbxJRqZBeobuOTXcFLPiPtqNvR14IQt8KKG6Xtg3ivBMaZAkhnhT4XFUGhgZDZD"
+const token = "EAAFV4wUyJZAwBAMK9GOCFY8E2G7hU7EH6jVlJwnH0jWhnNT4HtBP6pvFiDxBWSk63OJsWBLguP7IYZC2mBdAu31V3G3nR4oD8scjuuhuMIgXi7Jh2BwGl8TJDcIiAhHCtgxKGARRScsOZANnIRyJHmsEKCX4UkTBaLHGTnurGAdjcJEwyjh"
 
 // Process application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}))
@@ -16,13 +16,13 @@ app.use(bodyParser.json())
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 
-  let VERIFY_TOKEN = "yuliangzz"
+
 // Adds support for GET requests to our webhook
 app.get('/webhook', (req, res) => {
 
   // Your verify token. Should be a random string.
 
-    
+  let VERIFY_TOKEN = "yuliangzz"
   // Parse the query params
   let mode = req.query['hub.mode'];
   let token = req.query['hub.verify_token'];
@@ -78,7 +78,7 @@ function sendTextMessage(sender, text) {
     let messageData = { text:text }
     request({
 	    url: 'https://graph.facebook.com/v2.6/me/messages',
-	    qs: {access_token:VERIFY_TOKEN},
+	    qs: {access_token:token},
 	    method: 'POST',
 		json: {
 		    recipient: {id:sender},
