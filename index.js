@@ -42,14 +42,7 @@ app.post('/webhook/', function (req, res) {
 		  console.log("Connected!");
 		});
 
-		var uid = sender
-		var time = CURRENT_TIMESTAMP
-		var cont = text
 
-  	  	con.query('INSERT INTO Orders(UID, Time, Content) VALUE', (uid, time, cont), function(err, result){
-  	  		if(err) throw err
-  	  		console.log("Inserted")}
-  	  	)
 
 
     }
@@ -83,7 +76,7 @@ var con = mysql.createConnection({
   host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com:3306",
   user: "lyldayu",
   password: "ChatBot9"
-  database:"ChatBot"
+  database:"chatbot"
 });
 
 con.connect(function(err) {
@@ -93,7 +86,15 @@ con.connect(function(err) {
   }
   else
   {
-  	  console.log("Connected!")
+  	  	console.log("Connected!")
+  	  	var uid = 1
+		var time = 'now'
+		var cont = 'HI'
+		var sql = 'INSERT INTO Orders(UID, Time, Content) VALUES ?';
+  	  	con.query(sql, [uid, time, cont], function(err, result){
+  	  		if(err) throw err
+  	  		console.log("Inserted")}
+  	  	)
 
   }
 
