@@ -83,8 +83,7 @@ var mysql = require('mysql');
 var con = mysql.createConnection({
   host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com：3306",
   user: "lyldayu",
-  password: "ChatBot9",
-  database: "chatbot"
+  password: "ChatBot9"
 });
 
 con.connect(function(err) {
