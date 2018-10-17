@@ -42,10 +42,10 @@ app.post('/webhook/', function (req, res) {
 		  console.log("Connected!");
 		});
     }
-    res.sendStatus(200)
+    res.sendStatus(200).send("hello");
 })
 
-const token = "EAAFV4wUyJZAwBALlLJMoW0xYEdQVEf7X83V0xu3cwhJHi2ZCsoUkOtTxAtE331FZBkUX8N0MkAPGZAFAV9C45kVJOirvTgpTH22CK8mQATPiZCkweYkFoRZBOm82o58ttqUFb7nz5nwgiURm1fbmZCZArMZAEulsLRTPTqDkZAuexZAzgxSOS1tVGZBg"
+const token = "EAAFV4wUyJZAwBAPcOdAO5Herj98gyy951YIfjzAlXaX3ROk5LFQzzJUVgu824sgq4ymYEzMnribui0gr2TxxCy9okiSrMb78gNtmhcKgfZBtNO7zqM1dy6v2hxOPLt501rrsop5ZBo9UfZAZBIkDWHKvVQQxNxBKHoDQjLuUn3ZAmhuqY6J6HZC"
 
 function sendTextMessage(sender, text) {
     let messageData = { text:text }
