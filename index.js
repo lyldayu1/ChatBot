@@ -79,9 +79,10 @@ function sendTextMessage(sender, text) {
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
-	host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com：3306",
+	host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com",
 	user: "lyldayu",
 	password: "ChatBot9",
+	port: "3306",
 	database: "ChatBot"
 });
 
