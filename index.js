@@ -37,11 +37,15 @@ app.post('/webhook/', function (req, res) {
 		    let text = event.message.text
 		    sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
 	    }
+		con.connect(function(err) {
+		  if (err) throw err;
+		  console.log("Connected!");
+		});
     }
     res.sendStatus(200)
 })
 
-const token = "<PAGE_ACCESS_TOKEN>"
+const token = "EAAFV4wUyJZAwBALlLJMoW0xYEdQVEf7X83V0xu3cwhJHi2ZCsoUkOtTxAtE331FZBkUX8N0MkAPGZAFAV9C45kVJOirvTgpTH22CK8mQATPiZCkweYkFoRZBOm82o58ttqUFb7nz5nwgiURm1fbmZCZArMZAEulsLRTPTqDkZAuexZAzgxSOS1tVGZBg"
 
 function sendTextMessage(sender, text) {
     let messageData = { text:text }
@@ -61,3 +65,20 @@ function sendTextMessage(sender, text) {
 	    }
     })
 }
+
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com:3306",
+  user: "lyldayu",
+  password: "ChatBot9"
+});
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+  con.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log("Result: " + result);
+  });
+});
