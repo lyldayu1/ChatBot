@@ -37,18 +37,18 @@ app.post('/webhook/', function (req, res) {
 		    let text = event.message.text
 		    sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
 	    }
-		con.connect(function(err) {
-		  if (err) throw err;
-		  console.log("Connected!");
-		});
-		var sql = "INSERT INTO Orders(UID, Time, Content) VALUES(?, ?, ?)";
-		var uid = sender
-		var time = Date.Now()
-		var txt = text
-		con.query(sql, (uid, time, txt), function(err, result){
-			if(err) throw err;
-			console.log("added");
-		});
+		// con.connect(function(err) {
+		//   if (err) throw err;
+		//   console.log("Connected!");
+		// });
+		// var sql = "INSERT INTO Orders(UID, Time, Content) VALUES(?, ?, ?)";
+		// var uid = sender
+		// var time = Date.Now()
+		// var txt = text
+		// con.query(sql, (uid, time, txt), function(err, result){
+		// 	if(err) throw err;
+		// 	console.log("added");
+		// });
 
 
     }
