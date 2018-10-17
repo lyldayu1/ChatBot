@@ -54,7 +54,7 @@ app.post('/webhook', (req, res) => {
   let body = req.body;
 
   // Checks this is an event from a page subscription
-  if (body.object === 'page') {
+//  if (body.object === 'page') {
 
     let messaging_events = req.body.entry[0].messaging
     for (let i = 0; i < messaging_events.length; i++) {
@@ -66,10 +66,10 @@ app.post('/webhook', (req, res) => {
       }
     }
     res.sendStatus(200)
-  } else {
+//  } else {
     // Returns a '404 Not Found' if event is not from a page subscription
-    res.sendStatus(404);
-  }
+//    res.sendStatus(404);
+//  }
 
 });
 
