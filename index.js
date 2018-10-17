@@ -25,7 +25,7 @@ app.get('/webhook/', function (req, res) {
 
 // Spin up the server
 app.listen(app.get('port'), function() {
-	console.log('running on port', app.get('port'))
+	console.log('Express server is running at port', app.get('port'))
 })
 
 app.post('/webhook/', function (req, res) {
@@ -41,6 +41,17 @@ app.post('/webhook/', function (req, res) {
 		  if (err) throw err;
 		  console.log("Connected!");
 		});
+
+		var uid = sender
+		var time = CURRENT_TIMESTAMP
+		var cont = text
+
+  	  	con.query('INSERT INTO Orders(UID, Time, Content) VALUE', (uid, time, cont), function(err, result){
+  	  		if(err) throw err
+  	  		console.log("Inserted")}
+  	  	)
+
+
     }
     res.sendStatus(200).send("hello");
 })
@@ -72,13 +83,18 @@ var con = mysql.createConnection({
   host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com:3306",
   user: "lyldayu",
   password: "ChatBot9"
+  database:"ChatBot"
 });
 
 con.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-  con.query(sql, function (err, result) {
-    if (err) throw err;
-    console.log("Result: " + result);
-  });
+  if (err)
+  {
+  	console.log("ERROR in connection to DB")
+  }
+  else
+  {
+  	  console.log("Connected!")
+
+  }
+
 });
