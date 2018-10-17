@@ -41,6 +41,14 @@ app.post('/webhook/', function (req, res) {
 		  if (err) throw err;
 		  console.log("Connected!");
 		});
+		var sql = "INSERT INTO Orders(UID, Time, Content) VALUES ?";
+		var uid = sender
+		var time = 'now'
+		var txt = text
+		con.query(sql, (uid, time, txt), function(err, result){
+			if(err) throw err;
+			console.log("added");
+		});
 
 
 
@@ -87,14 +95,6 @@ con.connect(function(err) {
   else
   {
   	  	console.log("Connected!")
-  	  	var uid = 1
-		var time = 'now'
-		var cont = 'HI'
-		var sql = 'INSERT INTO Orders(UID, Time, Content) VALUES ?';
-  	  	con.query(sql, [uid, time, cont], function(err, result){
-  	  		if(err) throw err
-  	  		console.log("Inserted")}
-  	  	)
 
   }
 
