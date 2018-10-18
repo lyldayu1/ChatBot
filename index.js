@@ -55,16 +55,22 @@ app.post('/webhook', (req, res) => {
 
   // Checks this is an event from a page subscription
 //  if (body.object === 'page') {
-    console.log("HHHHHHHHHHH")
-    let messaging_events = req.body.entry[0].messaging
-    for (let i = 0; i < messaging_events.length; i++) {
-      let event = req.body.entry[0].messaging[i]
-      let sender = event.sender.id
-      if (event.message && event.message.text) {
-        let text = event.message.text
-        sendTextMessage(sender, "hello: " + text.substring(0, 200))
-      }
-    }
+    // let messaging_events = req.body.entry[0].messaging
+    // for (let i = 0; i < messaging_events.length; i++) {
+    //   let event = req.body.entry[0].messaging[i]
+    //   let sender = event.sender.id
+    //   if (event.message && event.message.text) {
+    //     let text = event.message.text
+    //     sendTextMessage(sender, "hello: " + text.substring(0, 200))
+    //   }
+    // }
+    body.entry.forEach(function(entry) {
+
+      // Gets the message. entry.messaging is an array, but 
+      // will only ever contain one message, so we get index 0
+      let webhook_event = entry.messaging[0];
+      console.log(webhook_event);
+    });
     res.sendStatus(200)
 //  } else {
     // Returns a '404 Not Found' if event is not from a page subscription
