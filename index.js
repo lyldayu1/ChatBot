@@ -71,6 +71,7 @@ app.post('/webhook', (req, res) => {
     //   let webhook_event = entry.messaging[0];
     //   console.log(webhook_event);
     // });
+    connectSql();
      res.sendStatus(200);
   // } else {
   //   // Returns a '404 Not Found' if event is not from a page subscription
@@ -108,16 +109,24 @@ var con = mysql.createConnection({
 	port: "3306",
 	database: "ChatBot"
 });
-
-con.connect(function(err) {
-	if (err)
-	{
-		console.log("ERROR in connection to DB")
-	}
-	else
-	{
-		console.log("Connected!")
-
-	}
+val count=0;
+function connectSql(){
+  con.connect(function(err) {
+  if (err)
+  {
+    console.log("ERROR in connection to DB")
+  }
+  else
+  {
+    console.log("Connected!")
+    val sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
+    count++;
+    con.query(sql,function(err,result){
+      if(err)throw err;
+      console.log("Table created");
+    })
+  }
 
 });
+}
+
