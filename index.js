@@ -22,7 +22,7 @@ function connectSql(UID,Time,Content){
     console.log(err);
   }else{
     console.log("Connected!")
-    var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+","+Content+")";
+    var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+",'"+Content+"')";
     con.query(sql,function(err,result){
     if(err)throw err;
       console.log("record inserted");
