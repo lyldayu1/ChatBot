@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const request = require('request')
 const app = express()
 const pagetoken = "EAACnr1hZBTZCoBAAvWCLAmoBcpftKOp2LKn3o2l5pMj6ZC7wf4ZA6KqFZCeswXCok3kURaAaDLbYjIvuZAiIxC3mLq29pRodX6undV7fZCXfQHLT5HAXrvwmpHSbUoJj5ZBd5d7R8N1eqEqnRvVRzaCoS3cPu3Rn1mZBkvq12xpwfbQTtIWLgVQQF"
-
+var mysql = require('mysql');
 // Process application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}))
 
@@ -120,7 +120,7 @@ function sendTextMessage(sender, text) {
     })
 }
 
-var mysql = require('mysql');
+
 
 var con = mysql.createConnection({
 	host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com",
@@ -129,7 +129,7 @@ var con = mysql.createConnection({
 	port: "3306",
 	database: "ChatBot"
 });
-var count=0;
+var count=1;
 // con.connect(function(err) {
 //   if (err)
 //   {
