@@ -109,7 +109,7 @@ var con = mysql.createConnection({
 	port: "3306",
 	database: "ChatBot"
 });
-val count=0;
+var count=0;
 function connectSql(){
   con.connect(function(err) {
   if (err)
