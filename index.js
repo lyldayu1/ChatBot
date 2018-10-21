@@ -15,21 +15,21 @@ app.use(bodyParser.json())
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 3000, () => console.log('webhook is listening'));
 
-// function connectSql(){
-//   con.connect(function(err) {
-//   if (err){
-//     console.log(err);
-//   }else{
-//     console.log("Connected!")
-//     var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
-//     count++;
-//     con.query(sql,function(err,result){
-//     if(err)throw err;
-//       console.log("Table created");
-//     });
-//   }
-// });
-// }
+
+function connectSql(UID,Time,Content){
+  con.connect(function(err) {
+  if (err){
+    console.log(err);
+  }else{
+    console.log("Connected!")
+    var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+","+Content+")";
+    con.query(sql,function(err,result){
+    if(err)throw err;
+      console.log("record inserted");
+    });
+  }
+});
+}
 
 
 
@@ -83,9 +83,10 @@ app.post('/webhook', (req, res) => {
     for (let i = 0; i < messaging_events.length; i++) {
       let event = req.body.entry[0].messaging[i]
       let sender = event.sender.id
+      let timestamp=event.timestamp;
       if (event.message && event.message.text) {
         let text = event.message.text;
-        //connectSql();
+        connectSql(sender,timestamp,text.substring(0, 200));
         sendTextMessage(sender, "hello: " + text.substring(0, 200))
       }
     }
@@ -134,23 +135,23 @@ var con = mysql.createConnection({
 	port: "3306",
 	database: "ChatBot"
 });
-var count=3;
-con.connect(function(err) {
-  if (err)
-  {
-    console.log("ERROR in connection to DB")
-  }
-  else
-  {
-    console.log("Connected!")
-    var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
-    count++;
-    con.query(sql,function(err,result){
-      if(err)throw err;
-      console.log("Table created");
-    })
-  }
+// var count=3;
+// con.connect(function(err) {
+//   if (err)
+//   {
+//     console.log("ERROR in connection to DB")
+//   }
+//   else
+//   {
+//     console.log("Connected!")
+//     var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
+//     count++;
+//     con.query(sql,function(err,result){
+//       if(err)throw err;
+//       console.log("Table created");
+//     })
+//   }
 
-});
+// });
 
 
