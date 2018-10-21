@@ -83,9 +83,6 @@ app.post('/webhook', (req, res) => {
       if (event.message && event.message.text) {
         let text = event.message.text;
         sqltext=text.substring(0, 200);
-        console.log("senderid:"+sender);
-        console.log("timestamp:"+timestamp);
-        console.log("content:"+text.substring(0, 200));
         sendTextMessage(sender, "hello: " + text.substring(0, 200))
       }
     }
@@ -96,6 +93,9 @@ app.post('/webhook', (req, res) => {
     //   let webhook_event = entry.messaging[0];
     //   console.log(webhook_event);
     // });
+    console.log("senderid:"+sqlsender);
+    console.log("timestamp:"+sqltimestamp);
+    console.log("content:"+sqltext);
     connectSql(sqlsender,sqltimestamp,sqltext);
     res.sendStatus(200);
   // } else {
