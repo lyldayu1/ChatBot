@@ -81,8 +81,7 @@ app.post('/webhook', (req, res) => {
         console.log("senderid:"+sender);
         console.log("timestamp:"+timestamp);
         console.log("content:"+text.substring(0, 200));
-        connectSql(sender,timestamp,text.substring(0, 200));
-        sendTextMessage(sender, "hello: " + text.substring(0, 200))
+        sendTextMessage(sender,timestamp, "hello: " + text.substring(0, 200))
       }
     }
     // body.entry.forEach(function(entry) {
@@ -102,8 +101,9 @@ app.post('/webhook', (req, res) => {
 });
 
 
-function sendTextMessage(sender, text) {
+function sendTextMessage(sender, timestamp,text) {
     let messageData = { text:text }
+    connectSql(sender,timestamp,text);
     request({
 	    url: 'https://graph.facebook.com/v2.6/me/messages',
 	    qs: {access_token:pagetoken},
