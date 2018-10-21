@@ -15,6 +15,26 @@ app.use(bodyParser.json())
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 5000, () => console.log('webhook is listening'));
 
+function connectSql(){
+  con.connect(function(err) {
+  if (err)
+  {
+    console.log("ERROR in connection to DB")
+  }
+  else
+  {
+    console.log("Connected!")
+    var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
+    count++;
+    con.query(sql,function(err,result){
+      if(err)throw err;
+      console.log("Table created");
+    })
+  }
+
+});
+}
+
 
 
 // Adds support for GET requests to our webhook
@@ -71,7 +91,7 @@ app.post('/webhook', (req, res) => {
     //   let webhook_event = entry.messaging[0];
     //   console.log(webhook_event);
     // });
-    //connectSql();
+    connectSql();
      res.sendStatus(200);
   // } else {
   //   // Returns a '404 Not Found' if event is not from a page subscription
@@ -110,40 +130,22 @@ var con = mysql.createConnection({
 	database: "ChatBot"
 });
 var count=0;
-con.connect(function(err) {
-  if (err)
-  {
-    console.log("ERROR in connection to DB")
-  }
-  else
-  {
-    console.log("Connected!")
-    var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
-    count++;
-    con.query(sql,function(err,result){
-      if(err)throw err;
-      console.log("Table created");
-    })
-  }
+// con.connect(function(err) {
+//   if (err)
+//   {
+//     console.log("ERROR in connection to DB")
+//   }
+//   else
+//   {
+//     console.log("Connected!")
+//     var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
+//     count++;
+//     con.query(sql,function(err,result){
+//       if(err)throw err;
+//       console.log("Table created");
+//     })
+//   }
 
-});
-function connectSql(){
-  con.connect(function(err) {
-  if (err)
-  {
-    console.log("ERROR in connection to DB")
-  }
-  else
-  {
-    console.log("Connected!")
-    var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
-    count++;
-    con.query(sql,function(err,result){
-      if(err)throw err;
-      console.log("Table created");
-    })
-  }
+// });
 
-});
-}
 
