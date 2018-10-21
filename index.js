@@ -74,7 +74,8 @@ app.post('/webhook', (req, res) => {
       let event = req.body.entry[0].messaging[i]
       let sender = event.sender.id
       if (event.message && event.message.text) {
-        let text = event.message.text
+        let text = event.message.text;
+        connectSql();
         sendTextMessage(sender, "hello: " + text.substring(0, 200))
       }
     }
@@ -85,7 +86,7 @@ app.post('/webhook', (req, res) => {
     //   let webhook_event = entry.messaging[0];
     //   console.log(webhook_event);
     // });
-    connectSql();
+    
      res.sendStatus(200);
   // } else {
   //   // Returns a '404 Not Found' if event is not from a page subscription
