@@ -17,20 +17,14 @@ app.listen(process.env.PORT || 5000, () => console.log('webhook is listening'));
 
 function connectSql(){
   con.connect(function(err) {
-  if (err)
-  {
-    console.log("ERROR in connection to DB")
-  }
-  else
-  {
-    console.log("Connected!")
-    var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
-    count++;
-    con.query(sql,function(err,result){
-      if(err)throw err;
-      console.log("Table created");
-    })
-  }
+  if (err)throw err;
+  console.log("Connected!")
+  var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
+  count++;
+  con.query(sql,function(err,result){
+  if(err)throw err;
+    console.log("Table created");
+  });
 
 });
 }
