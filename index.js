@@ -68,6 +68,9 @@ app.get('/webhook', (req, res) => {
 app.post('/webhook', (req, res) => {  
  
   let body = req.body;
+  let sqlsender=null;
+  let sqltimestamp=null;
+  let sqltext=null;
 
   // Checks this is an event from a page subscription
 //  if (body.object === 'page') {
@@ -75,13 +78,15 @@ app.post('/webhook', (req, res) => {
     for (let i = 0; i < messaging_events.length; i++) {
       let event = req.body.entry[0].messaging[i]
       let sender = event.sender.id
-      let timestamp=event.timestamp;
+      sqltimestamp=event.timestamp;
+      sqlsender=sender;
       if (event.message && event.message.text) {
         let text = event.message.text;
+        sqltest=text.substring(0, 200);
         console.log("senderid:"+sender);
         console.log("timestamp:"+timestamp);
         console.log("content:"+text.substring(0, 200));
-        sendTextMessage(sender,timestamp, "hello: " + text.substring(0, 200))
+        sendTextMessage(sender, "hello: " + text.substring(0, 200))
       }
     }
     // body.entry.forEach(function(entry) {
@@ -91,8 +96,8 @@ app.post('/webhook', (req, res) => {
     //   let webhook_event = entry.messaging[0];
     //   console.log(webhook_event);
     // });
-    
-     res.sendStatus(200);
+    connectSql(sqlsender,sqltimestamp,sqltext);
+    res.sendStatus(200);
   // } else {
   //   // Returns a '404 Not Found' if event is not from a page subscription
   //   res.sendStatus(404);
@@ -101,9 +106,8 @@ app.post('/webhook', (req, res) => {
 });
 
 
-function sendTextMessage(sender, timestamp,text) {
+function sendTextMessage(sender,text) {
     let messageData = { text:text }
-    connectSql(sender,timestamp,text);
     request({
 	    url: 'https://graph.facebook.com/v2.6/me/messages',
 	    qs: {access_token:pagetoken},
