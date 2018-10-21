@@ -82,7 +82,7 @@ app.post('/webhook', (req, res) => {
       sqlsender=sender;
       if (event.message && event.message.text) {
         let text = event.message.text;
-        sqltest=text.substring(0, 200);
+        sqltext=text.substring(0, 200);
         console.log("senderid:"+sender);
         console.log("timestamp:"+timestamp);
         console.log("content:"+text.substring(0, 200));
