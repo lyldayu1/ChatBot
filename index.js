@@ -69,14 +69,6 @@ app.post('/webhook', (req, res) => {
  
   let body = req.body;
 
-  body.entry.forEach(function(entry) {
-
-      // Gets the message. entry.messaging is an array, but 
-      // will only ever contain one message, so we get index 0
-      let webhook_event = entry.messaging[0];
-      console.log(webhook_event);
-    });
-
   // Checks this is an event from a page subscription
 //  if (body.object === 'page') {
     let messaging_events = req.body.entry[0].messaging
@@ -86,6 +78,9 @@ app.post('/webhook', (req, res) => {
       let timestamp=event.timestamp;
       if (event.message && event.message.text) {
         let text = event.message.text;
+        console.log("senderid:"+sender);
+        console.log("timestamp:"+timestamp);
+        console.log("content:"+text.substring(0, 200));
         connectSql(sender,timestamp,text.substring(0, 200));
         sendTextMessage(sender, "hello: " + text.substring(0, 200))
       }
