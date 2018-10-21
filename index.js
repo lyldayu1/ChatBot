@@ -119,7 +119,7 @@ function connectSql(){
   else
   {
     console.log("Connected!")
-    val sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
+    var sql="CREATE TABLE customers"+count+" (name VARCHAR(255), address VARCHAR(255))";
     count++;
     con.query(sql,function(err,result){
       if(err)throw err;
