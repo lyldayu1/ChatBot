@@ -16,24 +16,39 @@ app.use(bodyParser.json())
 app.listen(process.env.PORT || 3000, () => console.log('webhook is listening'));
 
 
+// function connectSql(UID,Time,Content){
+//   con.connect(function(err) {
+//   if (err){
+//     console.log(err);
+//   }else{
+//     console.log("Connected!")
+//     var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+",'"+Content+"')";
+//     con.query(sql,function(err,result){
+//       if(err){
+//         throw err;
+//       }
+//       console.log("record inserted");
+//     });
+//   }
+// });
+// }
+
 function connectSql(UID,Time,Content){
-  con.connect(function(err) {
+  pool.getConnection(function(err,con) {
   if (err){
-    con.end();
     console.log(err);
   }else{
     console.log("Connected!")
     var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+",'"+Content+"')";
     con.query(sql,function(err,result){
+      con.release();
       if(err){
-        con.end();
         throw err;
       }
       console.log("record inserted");
     });
   }
 });
-
 }
 
 
@@ -102,7 +117,7 @@ app.post('/webhook', (req, res) => {
     console.log("timestamp:"+sqltimestamp);
     console.log("content:"+sqltext);
     try{
-    connectSql(sqlsender,sqltimestamp,sqltext);
+      connectSql(sqlsender,sqltimestamp,sqltext);
     }catch(e){
       console.log(e);
     }
@@ -136,13 +151,23 @@ function sendTextMessage(sender,text) {
 
 
 
-var con = mysql.createConnection({
-	host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com",
-	user: "lyldayu",
-	password: "ChatBot9",
-	port: "3306",
-	database: "ChatBot"
+// var con = mysql.createConnection({
+// 	host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com",
+// 	user: "lyldayu",
+// 	password: "ChatBot9",
+// 	port: "3306",
+// 	database: "ChatBot"
+// });
+
+var pool = mysql.createPool({
+ connectLimit: 10,
+ host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com",
+ user: "lyldayu",
+ password: "ChatBot9",
+ port: "3306",
+ database: "ChatBot"
 });
+
 // var count=3;
 // con.connect(function(err) {
 //   if (err)
