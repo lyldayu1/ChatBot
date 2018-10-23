@@ -29,6 +29,7 @@ function connectSql(UID,Time,Content){
     });
   }
 });
+  con.end();
 }
 
 
