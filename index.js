@@ -19,17 +19,21 @@ app.listen(process.env.PORT || 3000, () => console.log('webhook is listening'));
 function connectSql(UID,Time,Content){
   con.connect(function(err) {
   if (err){
+    con.end();
     console.log(err);
   }else{
     console.log("Connected!")
     var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+",'"+Content+"')";
     con.query(sql,function(err,result){
-    if(err)throw err;
+      if(err){
+        con.end();
+        throw err;
+      }
       console.log("record inserted");
     });
   }
 });
-  con.end();
+
 }
 
 
