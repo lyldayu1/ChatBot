@@ -103,6 +103,11 @@ app.post('/webhook', (req, res) => {
       if (event.message && event.message.text) {
         let text = event.message.text;
         sqltext=text.substring(0, 200);
+        try{
+          connectSql(sender,sqltimestamp,sqltext);
+        }catch(e){
+          console.log(e);
+        }
         sendTextMessage(sender, "hello: " + text.substring(0, 200))
       }
     }
@@ -113,14 +118,14 @@ app.post('/webhook', (req, res) => {
     //   let webhook_event = entry.messaging[0];
     //   console.log(webhook_event);
     // });
-    console.log("senderid:"+sqlsender);
-    console.log("timestamp:"+sqltimestamp);
-    console.log("content:"+sqltext);
-    try{
-      connectSql(sqlsender,sqltimestamp,sqltext);
-    }catch(e){
-      console.log(e);
-    }
+    // console.log("senderid:"+sqlsender);
+    // console.log("timestamp:"+sqltimestamp);
+    // console.log("content:"+sqltext);
+    // try{
+    //   connectSql(sqlsender,sqltimestamp,sqltext);
+    // }catch(e){
+    //   console.log(e);
+    // }
     res.sendStatus(200);
   } else {
   //   // Returns a '404 Not Found' if event is not from a page subscription
