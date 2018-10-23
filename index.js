@@ -101,7 +101,11 @@ app.post('/webhook', (req, res) => {
     console.log("senderid:"+sqlsender);
     console.log("timestamp:"+sqltimestamp);
     console.log("content:"+sqltext);
+    try{
     connectSql(sqlsender,sqltimestamp,sqltext);
+    }catch(e){
+      console.log(e);
+    }
     res.sendStatus(200);
   // } else {
   //   // Returns a '404 Not Found' if event is not from a page subscription
