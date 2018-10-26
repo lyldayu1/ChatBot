@@ -1,5 +1,40 @@
 'use strict'
 
+// Wit.AI
+let Wit = require('node-wit').Wit
+let log = require('node-wit').log
+const WitToken = 'RRAEVMQZPZNVJ6P3X4XJMOT6SZTH3ONL'
+
+// This will contain all user sessions.
+// Each session has an entry:
+// sessionId -> {fbid: facebookUserId, context: sessionState}
+const sessions = {};
+
+const findOrCreateSession = (fbid) => {
+  let sessionId;
+  // Let's see if we already have a session for the user fbid
+  Object.keys(sessions).forEach(k => {
+    if (sessions[k].fbid === fbid) {
+      // Yep, got it!
+      sessionId = k;
+    }
+  });
+  if (!sessionId) {
+    // No session found for user fbid, let's create a new one
+    sessionId = new Date().toISOString();
+    sessions[sessionId] = {fbid: fbid, context: {}};
+  }
+  return sessionId;
+};
+
+// Setting up our bot
+const wit = new Wit({
+  accessToken: WitToken,
+  logger: new log.Logger(log.INFO)
+})
+
+
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const request = require('request')
@@ -108,7 +143,17 @@ app.post('/webhook', (req, res) => {
         }catch(e){
           console.log(e);
         }
-        sendTextMessage(sender, "hello: " + text.substring(0, 200))
+
+        wit.message(text).then(({entities}) => {
+          // You can customize your response to these entities
+          console.log(entities);
+          // For now, let's reply with another automatic message
+          sendTextMessage(sender, "hello: " + JSON.stringify(entities))
+        })
+        .catch((err) => {
+          console.error('Oops! Got an error from Wit: ', err.stack || err);
+        })
+
       }
     }
     // body.entry.forEach(function(entry) {
