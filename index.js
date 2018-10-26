@@ -25,6 +25,7 @@ const findOrCreateSession = (fbid) => {
     sessions[sessionId] = {fbid: fbid, context: {}};
     // Send the first message to user
     sendTextMessage(fbid, "Hi. Make order, reservation, recommend a food, or request info?")
+    console.log("sender: " + fbid)
   }
   return sessionId;
 };
