@@ -23,6 +23,8 @@ const findOrCreateSession = (fbid) => {
     // No session found for user fbid, let's create a new one
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
+    // Send the first message to user
+    sendTextMessage(fbid, "Hi. Make order, reservation, recommend a food, or request info?")
   }
   return sessionId;
 };
@@ -143,6 +145,10 @@ app.post('/webhook', (req, res) => {
         }catch(e){
           console.log(e);
         }
+        
+        // We could retrieve the user's current session, or create one if it doesn't exist
+        // This is useful if we want our bot to figure out the conversation history
+        const sessionId = findOrCreateSession(sender);
 
         wit.message(text).then(({entities}) => {
           // You can customize your response to these entities
