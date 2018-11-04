@@ -120,7 +120,9 @@ app.get('/webhook', (req, res) => {
 });
 
 
-
+app.get('/test', (req, res) => {
+    res.send("test successed!");
+})
 
 // Creates the endpoint for our webhook 
 app.post('/webhook', (req, res) => {  
