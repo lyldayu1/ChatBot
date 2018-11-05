@@ -119,25 +119,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-
-app.get('/test', (req, res) => {
-    //res.send("test successed!");
-    pool.getConnection((err, con) => {
-        if (err)
-            res.send("Database connection Error!");
-        else {
-            var sql = "SELECT * FROM Conversations";
-            con.query(sql, function (error, rows, fields) {
-                if (error)
-                    res.send("Something went wrong!!!");
-                else {
-                    res.send(rows[0]);
-                }
-            })
-        }
-    })
-})
-
 // Creates the endpoint for our webhook 
 app.post('/webhook', (req, res) => {  
  
@@ -267,4 +248,39 @@ var pool = mysql.createPool({
  *  4. Due by 11/06/2018
  */
 
+//APIs for Fronet End
 
+//DataBase Connection Testing
+app.get('/test', (req, res) => {
+    //res.send("test successed!");
+    pool.getConnection((err, con) => {
+        if (err)
+            res.send("Database connection Error!");
+        else {
+            var sql = "SELECT * FROM Conversations";
+            con.query(sql, function (error, rows, fields) {
+                if (error)
+                    res.send("Something went wrong!!!");
+                else {
+                    res.send(rows[0]);
+                }
+            })
+        }
+    })
+});
+
+// +++++++++++++++++++++++++ REAL APIs Starts Here +++++++++++++++++++++++++ //
+
+//Get updated order
+app.get('/recentOrders', (req, res) => {
+    res.send("This linke should give user the last orders");
+});
+
+//Get weekly report
+app.get('/orderHistrory', (req, res) => {
+    res.send("This should display order history within a week");
+});
+
+app.get('/Report', (req, res) => {
+    res.send("This should give some statistics");
+});
