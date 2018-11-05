@@ -121,7 +121,21 @@ app.get('/webhook', (req, res) => {
 
 
 app.get('/test', (req, res) => {
-    res.send("test successed!");
+    //res.send("test successed!");
+    pool.getConnection((err, con) => {
+        if (err)
+            res.send("Database connection Error!");
+        else {
+            var sql = "SELECT * FROM Conversations";
+            con.query(sql, function (error, rows, fields) {
+                if (error)
+                    res.send("Something went wrong!!!");
+                else {
+                    res.send(rows[0]);
+                }
+            })
+        }
+    })
 })
 
 // Creates the endpoint for our webhook 
@@ -245,5 +259,12 @@ var pool = mysql.createPool({
 //   }
 
 // });
+
+/* To do list
+ *  1. Figure out how to connect database
+ *  2. Get data from the data base (Json)
+ *  3. Create a meaningful database structure
+ *  4. Due by 11/06/2018
+ */
 
 
