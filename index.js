@@ -257,12 +257,12 @@ app.get('/test', (req, res) => {
         if (err)
             res.send("Database connection Error!");
         else {
-            var sql = "SELECT * FROM Conversations";
+            var sql = "SELECT * FROM Orders";
             con.query(sql, function (error, rows, fields) {
                 if (error)
                     res.send("Something went wrong!!!");
                 else {
-                    res.send(rows[0]);
+                    res.send(rows);
                 }
             })
         }
