@@ -262,7 +262,7 @@ app.get('/test', (req, res) => {
                 if (error)
                     res.send("Something went wrong!!!");
                 else {
-                    res.send(rows);
+                    res.json(JSON.parse(rows));
                 }
             })
         }
