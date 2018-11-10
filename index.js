@@ -262,7 +262,8 @@ app.get('/test', (req, res) => {
                 if (error)
                     res.send("Something went wrong!!!");
                 else {
-                    res.json(rows);
+                    var resJSON = JSON.stringify(JSON.parse(rows))
+                    res.json(resJSON);
                 }
             })
         }
