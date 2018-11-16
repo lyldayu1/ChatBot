@@ -259,6 +259,7 @@ app.get('/test', (req, res) => {
         else {
             var sql = "SELECT * FROM Orders";
             con.query(sql, function (error, rows, fields) {
+		con.release();
                 if (error)
                     res.send("Something went wrong!!!");
                 else {
