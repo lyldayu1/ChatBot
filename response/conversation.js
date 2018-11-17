@@ -31,7 +31,7 @@
 
 // IMPORTS:
 // Parsing Module
-const _parser = require('./parser.js')
+// const _parser = require('./parser.js')
 // Data Modules
 const _restaurant_data_module = require('./info_restaurant')
 const _order_data_module = require('./info_order')
@@ -97,8 +97,8 @@ class Conversation {
         if (this.stage == 999) {
             return (-1, "")
         }
-        var recv = _parser(json_sentence)
-        return this._converse(recv)
+        //var recv = _parser(json_sentence)
+        return this._converse(json_sentence)
     }
 
     _converse(recv) {
@@ -153,7 +153,7 @@ class Conversation {
     }
 
     _converse_ps1(recv) {
-        if (recv.order == true) {
+        if ("order" in recv.entities) {
             // Make order (201 - 203, 209)
             // 202 = Require additional info
             // 203 = Require confirmation
@@ -166,7 +166,7 @@ class Conversation {
             }
             this.stage = 201
             return 0
-        } else if (recv.make_reservation == true) {
+        } else if ("make_reservation" in recv.entities) {
             // Make reservation (211 - 213, 219)
             // 212 = Require additional info
             // 213 = Require confirmation
@@ -178,12 +178,12 @@ class Conversation {
                 this.stage = 213
             }
             return 0
-        } else if (recv.info_request == true) {
+        } else if ("info_request" in recv.entities) {
             // Request restaurant info (229)
             // 229 = Response and ask for more questions
             this.stage = 229
             return 0
-        } else if (recv.feedback == true) {
+        } else if ("feedback" in recv.entities) {
             // Make feedback (231 - 233, 239)
             // 232 = Require additional info (rating)
             // 239 = Ask if anything else

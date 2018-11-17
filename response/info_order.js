@@ -46,6 +46,36 @@ class Dish {
     }
 }
 
+class Fries {
+    constructor(size=null) {
+        this.size = size
+    }
+
+    whatIsNotFilled() {
+        if (this.size == null) {
+            return 1
+        }
+        return 0
+    }
+}
+
+class Drink {
+    constructor(type=null,
+                size=null) {
+        this.type = type
+        this.size = size
+    }
+
+    whatIsNotFilled() {
+        if (this.type == null) {
+            return 1
+        } else if (this.size == null) {
+            return 2
+        }
+        return 0
+    }
+}
+
 module.exports = class Order {
     constructor() {
         this.order_no = Math.floor(Math.random()*1000000)
@@ -92,12 +122,22 @@ module.exports = class Order {
     }
 
     addFill(recv) {
+        var food_type = null, if_combo = null, if_onion = null,
+            combo_size = null, drink_type = null;
+        if ("food_type" in recv.entities){
+            food_type = recv.entities.food_type.value
+        }
         this.dishlist.push(new Dish(food_type, if_combo, if_onion,
                                     combo_size, drink_type))
     }
 
+    Fill(index, recv) {
+        // Given index, fill dish
+    }
+
     removeDish(index) {
         this.dishlist.splice(index, 1)
+        return 0
     }
 
     searchDish(food_type) {
