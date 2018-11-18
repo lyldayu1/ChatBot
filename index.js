@@ -9,8 +9,9 @@ const WitToken = 'RRAEVMQZPZNVJ6P3X4XJMOT6SZTH3ONL'
 // Each session has an entry:
 // sessionId -> {fbid: facebookUserId, context: sessionState}
 const sessions = {};
-
+var responseRobot=null;
 const findOrCreateSession = (fbid) => {
+  responseRobot=require('./response/conversation')
   let sessionId;
   // Let's see if we already have a session for the user fbid
   Object.keys(sessions).forEach(k => {
@@ -27,7 +28,6 @@ const findOrCreateSession = (fbid) => {
     sendTextMessage(fbid, "Hi. Make order, reservation, recommend a food, or request info?")
     console.log("sender: " + fbid)
   }
-  var responseRobot=require('./response/conversation')
   return sessionId;
 };
 
