@@ -298,4 +298,5 @@ class Conversation {
     }
 }
 
-var c = new Conversation()
+//var c = new Conversation()
+module.exports=new Conversation()

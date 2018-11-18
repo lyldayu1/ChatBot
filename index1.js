@@ -27,7 +27,6 @@ const findOrCreateSession = (fbid) => {
     sendTextMessage(fbid, "Hi. Make order, reservation, recommend a food, or request info?")
     console.log("sender: " + fbid)
   }
-  var responseRobot=require('./response/conversation')
   return sessionId;
 };
 
@@ -38,7 +37,7 @@ const wit = new Wit({
 })
 
 
-//var responseRobot=require('./response/conversation')
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const request = require('request')
@@ -149,13 +148,11 @@ app.post('/webhook', (req, res) => {
         // This is useful if we want our bot to figure out the conversation history
         const sessionId = findOrCreateSession(sender);
 
-
         wit.message(text).then(({entities}) => {
           // You can customize your response to these entities
           console.log(entities);
           // For now, let's reply with another automatic message
-          let reponseText=responseRobot.converse(entities)
-          sendTextMessage(sender, reponseText)
+          sendTextMessage(sender, "hello: " + JSON.stringify(entities))
         })
         .catch((err) => {
           console.error('Oops! Got an error from Wit: ', err.stack || err);
