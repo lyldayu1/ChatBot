@@ -88,6 +88,7 @@ module.exports = class Conversation {
         this._feedback = new _feedback_data_module()
         this._multiple_dish_flag = false
         this._bot_confused = false
+
         // Initialize greeting:
         console.log(_greetings_resp_module())
     }
@@ -111,6 +112,7 @@ module.exports = class Conversation {
          *      Status code and the response text from _converse().
          *      Will return status code -1 if this.stage == 999.
          */
+         console.log("success!!!")
         if (this.stage == 999) {
             return (-1, "")
         } else {
@@ -399,4 +401,9 @@ module.exports = class Conversation {
         }
     }
 }
+
+
+
+//var c = new Conversation()
+module.exports=new Conversation()
 
