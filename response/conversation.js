@@ -71,6 +71,7 @@ class Conversation {
         this._dishno = 0
         this._reservation = new _reservation_data_module()
         this._feedback = new _feedback_data_module()
+        console.log("init")
         // Initialize greeting:
         console.log(_greetings_resp_module())
     }
@@ -94,6 +95,7 @@ class Conversation {
          *      Status code and the response text from _converse().
          *      Will return status code -1 if this.stage == 999.
          */
+         console.log("success!!!")
         if (this.stage == 999) {
             return (-1, "")
         }
