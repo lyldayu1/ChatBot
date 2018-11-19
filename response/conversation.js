@@ -30,8 +30,6 @@
 
 
 // IMPORTS:
-// Parsing Module
-// const _parser = require('./parser.js')
 // Data Modules
 const _restaurant_data_module = require('./info_restaurant')
 const _order_data_module = require('./info_order')
@@ -45,21 +43,38 @@ const _feedback_resp_module = require('./resp_feedback')
 const _restaurant_resp_module = require('./resp_restaurant')
 
 
-class Conversation {
+// MACROS:
+// WIT.AI MACROS
+const ORDER = "order"
+const RESERVE = "make_reservation"
+const INFO_REQ = "info_request"
+const FEEDBACK = "feedback"
+const YN_LIST = "conversationEnd"
+const YES = "yes"
+const NO = "no"
+// RESP_MACROS
+const APPEND_CONFIRM = " Is that right?"
+const ORDER_CONFIRM = "Please confirm your order: \n"
+const SPECIAL_INST = "Any special instructions related to your order?"
+const ORDER_FINISHED = "Order Finished!"
+const BOT_CONFUSED = "I'm sorry. But I don't understand."
+
+
+module.exports = class Conversation {
     /** Handles the interaction between messages and index.js
      *  @param {integer} this.stage:
      *      class variable that stores the stage of the conversation.
      *  @param {integer} this._id:
      *      order id
-     *  @param {integer} this._restaurant:
+     *  @param {object} this._restaurant:
      *      Restaurant class object (info_restaurant.js)
-     *  @param {integer} this._order:
+     *  @param {object} this._order:
      *      Order class object (info_order.js)
      *  @param {integer} this._dishno:
      *      Current dish index for this._order.dishlist
-     *  @param {integer} this._reservation:
+     *  @param {object} this._reservation:
      *      Reservation class object (info_reservation.js)
-     *  @param {integer} this._feedback:
+     *  @param {object} this._feedback:
      *      Feedback class object (info_feedback.js)
      */
 
@@ -71,7 +86,9 @@ class Conversation {
         this._dishno = 0
         this._reservation = new _reservation_data_module()
         this._feedback = new _feedback_data_module()
-        console.log("init")
+        this._multiple_dish_flag = false
+        this._bot_confused = false
+
         // Initialize greeting:
         console.log(_greetings_resp_module())
     }
@@ -80,8 +97,8 @@ class Conversation {
         /* Developer use:
          * Returns conversation id and its stage
          */
-        return "Order id: " + toString(this._id)
-               + " at stage " + toString(this.stage) + "."
+        return "Order id: " + String(this._id)
+               + " at stage " + String(this.stage) + "."
     }
 
     converse(json_sentence) {
@@ -98,9 +115,9 @@ class Conversation {
          console.log("success!!!")
         if (this.stage == 999) {
             return (-1, "")
+        } else {
+            return this._converse(json_sentence)
         }
-        //var recv = _parser(json_sentence)
-        return this._converse(json_sentence)
     }
 
     _converse(recv) {
@@ -127,12 +144,16 @@ class Conversation {
         } else {
             console.log("ERROR: Invalid primary stage number " + 
                         + toString(primary_stage) + ".")
-            return 1
+            this._bot_confused == true
         }
         if (res != 0) {
             console.log("ERROR: At primary stage " + toString(primary_stage))
             console.log("ERROR: Converse function returns non-zero.")
-            return 1
+            this._bot_confused == true
+        }
+        if (this._bot_confused == true) {
+            this._bot_confused = false
+            return 1, BOT_CONFUSED
         }
         primary_stage = Math.floor(this.stage / 100)
         var text = ""
@@ -142,33 +163,41 @@ class Conversation {
             res, text = this._response_ps2(recv)
         } else if (primary_stage == 3) {
             res, text = this._response_ps3(recv)
+        } else if (primary_stage == 9) {
+            return -1, ORDER_FINISHED
         } else {
             console.log("ERROR: Invalid primary stage number.")
-            return (1, text)
+            return 1, text
         }
         if (res != 0) {
             console.log("ERROR: At primary stage " + toString(primary_stage))
             console.log("ERROR: Converse function returns non-zero.")
-            return (1, text)
+            return 1, text
         }
-        return (0, text)
+        return 0, text
     }
 
     _converse_ps1(recv) {
-        if ("order" in recv.entities) {
+        if (ORDER in recv) {
             // Make order (201 - 203, 209)
+            // 201 = Require food type
             // 202 = Require additional info
             // 203 = Require confirmation
-            this._order.addFill(this._dishno, recv)
-            var res = this._order.whatIsNotFilled()
+            var res = 0
+            res = this._order.addFill(recv)
+            if (res == 1) {
+                this.stage = 201
+                return 0
+            }
+            res = this._order.whatIsNotFilled()
             if (res != (this._dishno, 0)) {
                 this.stage = 202
+                return 0
             } else {
                 this.stage = 203
+                return 0
             }
-            this.stage = 201
-            return 0
-        } else if ("make_reservation" in recv.entities) {
+        } else if (RESERVE in recv) {
             // Make reservation (211 - 213, 219)
             // 212 = Require additional info
             // 213 = Require confirmation
@@ -180,12 +209,12 @@ class Conversation {
                 this.stage = 213
             }
             return 0
-        } else if ("info_request" in recv.entities) {
+        } else if (INFO_REQ in recv) {
             // Request restaurant info (229)
             // 229 = Response and ask for more questions
             this.stage = 229
             return 0
-        } else if ("feedback" in recv.entities) {
+        } else if (FEEDBACK in recv) {
             // Make feedback (231 - 233, 239)
             // 232 = Require additional info (rating)
             // 239 = Ask if anything else
@@ -198,27 +227,63 @@ class Conversation {
             return 0
         } else {
             // Bot is confused, stage stays at 101
-            console.log("I'm sorry. I don't understand.")
+            this._bot_confused = true
             return 0
         }
     }
 
     _converse_ps2(recv) {
-        var secondary_stage = Math.floor(this.stage / 100) % 10
+        var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
         if (secondary_stage == 0) {
             // Make order (201 - 203, 209)
+            // 201 = Require food type
             // 202 = Require additional info
             // 203 = Require confirmation
             // 209 = Ask for more dishes
-            this._order.fill(this._dishno, recv)
-            var res = this._order.whatIsNotFilled()
-            if (res != (this._dishno, 0)) {
-                this.stage = 202
-            } else {
-                this.stage = 203
+            if (progress_stage == 1) {
+                var res = 0
+                res = this._order.addFill(recv)
+                if (res == 1) {
+                    this._bot_confused = true
+                    return 0
+                }
+                res = this._order.whatIsNotFilled()
+                if (res != (this._dishno, 0)) {
+                    this.stage = 202
+                } else {
+                    this.stage = 203
+                }
+                return 0
+            } else if (progress_stage == 2) {
+                this._order.fill(this._dishno, recv)
+                var res = this._order.whatIsNotFilled()
+                if (res == (this._dishno, 0)) {
+                    this.stage = 203
+                }
+                return 0
+            } else if (progress_stage == 3) {
+                // TODO: change dish content
+                if (this._yn_parsing(recv) == true) {
+                    this.stage = 209
+                } else {
+                    this.stage = 203
+                }
+                return 0
+            } else if (progress_stage == 9) {
+                if (this._yn_parsing(recv) == false) {
+                    if (this._order.dishlist.length > 1) {
+                        this.stage = 301
+                    } else {
+                        this.stage = 302
+                    }
+                } else {
+                    this._multiple_dish_flag = true
+                    this._dishno = this._dishno + 1
+                    this.stage = 201
+                }
+                return 0
             }
-            return 0
         } else if (secondary_stage == 1) {
             // Make reservation (211 - 213, 219)
             // 212 = Require additional info
@@ -244,7 +309,7 @@ class Conversation {
             return 0
         } else {
             // Bot is confused, stage stays at the current stage
-            console.log("I'm sorry. I don't understand.")
+            this._bot_confused = true
             return 0
         }
     }
@@ -252,12 +317,24 @@ class Conversation {
     _converse_ps3(recv) {
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
-            this.stage = 302
+            // TODO: change order
+            if (this._yn_parsing(recv) == true) {
+                this.stage = 302
+            } else {
+                this.stage = 301
+            }
+            return 0
         } else if (progress_stage == 2) {
-            this.stage = 999
+            // TODO: special instructions, do not need to confirm
+            if (this._yn_parsing(recv) == false) {
+                this.stage = 999
+            } else {
+                this.stage = 999
+            }
+            return 0
         } else {
             // Bot is confused, stage stays at the current stage
-            console.log("I'm sorry. I don't understand.")
+            this._bot_confused = true
             return 0
         }
     }
@@ -267,14 +344,23 @@ class Conversation {
     }
 
     _response_ps2(recv) {
-        var secondary_stage = Math.floor(this.stage / 100) % 10
+        var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
         if (secondary_stage == 0) {
-            return _order_resp_module(
-                        progress_stage,
-                        this._order.dishlist[this.dishno].if_combo,
-                        this._order.dishlist[this.dishno].whatIsNotFilled()
-                    )
+            var res = 0, text = null
+            res, text =  _order_resp_module(
+                             progress_stage,
+                             this._multiple_dish_flag,
+                             this._order.dishlist[this._dishno].whatIsNotFilled()
+                         )
+            if (progress_stage != 3) {
+                return res, text
+            } else {
+                text = text +
+                       this._order.dishlist[this._dishno].customerReport() +
+                       APPEND_CONFIRM
+                return res, text
+            }
         } else if (secondary_stage == 1) {
             return _reservation_resp_module(
                 this._reservation.whatIsNotFilled()
@@ -292,13 +378,32 @@ class Conversation {
 
     _response_ps3(recv) {
         var progress_stage = this.stage % 10
-        if (progress_stage == 0) {
-            return 0, "Please confirm your order: \n" + this._order.print()
-        } else if (progress_stage == 1) {
-            return 0, "Anything else you need?"
+        if (progress_stage == 1) {
+            return 0, ORDER_CONFIRM + this._order.print()
+        } else if (progress_stage == 2) {
+            return 0, SPECIAL_INST
+        }
+    }
+
+    _yn_parsing(recv) {
+        if (YN_LIST in recv) {
+            if (recv.conversationEnd[0].value == YES) {
+                return true
+            } else if (recv.conversationEnd[0].value == NO) {
+                return false
+            } else {
+                throw "_yn_parsing cannot parse value " + 
+                      recv.conversationEnd[0].value
+            }
+        } else {
+            throw "conversationEnd not in recv" + 
+            recv.conversationEnd[0].value
         }
     }
 }
 
+
+
 //var c = new Conversation()
 module.exports=new Conversation()
+
