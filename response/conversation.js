@@ -60,7 +60,7 @@ const ORDER_FINISHED = "Order Finished!"
 const BOT_CONFUSED = "I'm sorry. But I don't understand."
 
 
-module.exports = class Conversation {
+class Conversation {
     /** Handles the interaction between messages and index.js
      *  @param {integer} this.stage:
      *      class variable that stores the stage of the conversation.
