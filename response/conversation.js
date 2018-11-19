@@ -57,7 +57,7 @@ const APPEND_CONFIRM = " Is that right?"
 const ORDER_CONFIRM = "Please confirm your order: \n"
 const SPECIAL_INST = "Any special instructions related to your order?"
 const ORDER_FINISHED = "Order Finished!"
-const BOT_CONFUSED = "I'm sorry. But I don't understand."
+const BOT_CONFUSED = "I am sorry. But I do not understand."
 
 
 class Conversation {
