@@ -160,14 +160,14 @@ app.post('/webhook', (req, res) => {
             // For now, let's reply with another automatic message
             let reponseText=responseRobot.converse(entities)
             sendTextMessage(sender, reponseText)
+            if(reponseText=='Order Finished!'){
+              responseRobot=require('./response/conversation')
+            }
           })
           .catch((err) => {
             console.error('Oops! Got an error from Wit: ', err.stack || err);
           })
         }
-
-        
-
       }
     }
     // body.entry.forEach(function(entry) {
