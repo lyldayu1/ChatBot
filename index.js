@@ -10,6 +10,7 @@ const WitToken = 'RRAEVMQZPZNVJ6P3X4XJMOT6SZTH3ONL'
 // sessionId -> {fbid: facebookUserId, context: sessionState}
 const sessions = {};
 var responseRobot=null;
+var flag=0
 const findOrCreateSession = (fbid) => {
   //responseRobot=require('./response/conversation')
   let sessionId;
@@ -23,6 +24,7 @@ const findOrCreateSession = (fbid) => {
   if (!sessionId) {
     // No session found for user fbid, let's create a new one
     responseRobot=require('./response/conversation')
+    flag=1
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
     // Send the first message to user
@@ -149,18 +151,22 @@ app.post('/webhook', (req, res) => {
         // We could retrieve the user's current session, or create one if it doesn't exist
         // This is useful if we want our bot to figure out the conversation history
         const sessionId = findOrCreateSession(sender);
-
-
-        wit.message(text).then(({entities}) => {
+        if(flag==1){
+          flag=0;
+        }else{
+          wit.message(text).then(({entities}) => {
           // You can customize your response to these entities
-          console.log(entities);
-          // For now, let's reply with another automatic message
-          let reponseText=responseRobot.converse(entities)
-          sendTextMessage(sender, reponseText)
-        })
-        .catch((err) => {
-          console.error('Oops! Got an error from Wit: ', err.stack || err);
-        })
+            console.log(entities);
+            // For now, let's reply with another automatic message
+            let reponseText=responseRobot.converse(entities)
+            sendTextMessage(sender, reponseText)
+          })
+          .catch((err) => {
+            console.error('Oops! Got an error from Wit: ', err.stack || err);
+          })
+        }
+
+        
 
       }
     }
