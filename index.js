@@ -11,7 +11,7 @@ const WitToken = 'RRAEVMQZPZNVJ6P3X4XJMOT6SZTH3ONL'
 const sessions = {};
 var responseRobot=null;
 const findOrCreateSession = (fbid) => {
-  responseRobot=require('./response/conversation')
+  //responseRobot=require('./response/conversation')
   let sessionId;
   // Let's see if we already have a session for the user fbid
   Object.keys(sessions).forEach(k => {
@@ -22,6 +22,7 @@ const findOrCreateSession = (fbid) => {
   });
   if (!sessionId) {
     // No session found for user fbid, let's create a new one
+    responseRobot=require('./response/conversation')
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
     // Send the first message to user
