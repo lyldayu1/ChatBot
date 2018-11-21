@@ -160,7 +160,7 @@ app.post('/webhook', (req, res) => {
             // For now, let's reply with another automatic message
             let reponseText=responseRobot.converse(entities)
             sendTextMessage(sender, reponseText)
-            if(reponseText=='Order Finished!'){
+            if(responseRobot.stage == 999){
               responseRobot=require('./response/conversation')
             }
           })
