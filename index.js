@@ -159,10 +159,10 @@ app.post('/webhook', (req, res) => {
             console.log(entities);
             // For now, let's reply with another automatic message
             let reponseText=responseRobot.converse(entities)
-            sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
               responseRobot=require('./response/conversation')
             }
+            sendTextMessage(sender, reponseText)
           })
           .catch((err) => {
             console.error('Oops! Got an error from Wit: ', err.stack || err);
