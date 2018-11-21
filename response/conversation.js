@@ -88,9 +88,6 @@ class Conversation {
         this._feedback = new _feedback_data_module()
         this._multiple_dish_flag = false
         this._bot_confused = false
-
-        // Initialize greeting:
-        console.log(_greetings_resp_module())
     }
 
     print() {
@@ -348,11 +345,21 @@ class Conversation {
         var progress_stage = this.stage % 10
         if (secondary_stage == 0) {
             var res = 0, text = null
-            res, text =  _order_resp_module(
-                             progress_stage,
-                             this._multiple_dish_flag,
-                             this._order.dishlist[this._dishno].whatIsNotFilled()
-                         )
+            // Input flow control
+            if (progress_stage != 1) {
+                res, text =  _order_resp_module(
+                    progress_stage,
+                    this._multiple_dish_flag,
+                    this._order.dishlist[this._dishno].whatIsNotFilled()
+                )
+            } else {
+                res, text =  _order_resp_module(
+                    progress_stage,
+                    this._multiple_dish_flag,
+                    1
+                )
+            }
+            // Output flow control
             if (progress_stage != 3) {
                 return res, text
             } else {
