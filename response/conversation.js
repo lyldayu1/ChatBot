@@ -407,7 +407,11 @@ class Conversation {
             recv.conversationEnd[0].value
         }
     }
+    renew(){
+        return new Conversation();
+    }
 }
+
 
 
 

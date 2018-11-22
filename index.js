@@ -163,7 +163,7 @@ app.post('/webhook', (req, res) => {
             if(responseRobot.stage == 999){
               console.log("renew robot")
               responseRobot=null
-              responseRobot=require('./response/conversation')
+              responseRobot=responseRobot.renew()
             }
             sendTextMessage(sender, reponseText)
           })
