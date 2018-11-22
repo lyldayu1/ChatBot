@@ -159,6 +159,7 @@ app.post('/webhook', (req, res) => {
             console.log(entities);
             // For now, let's reply with another automatic message
             let reponseText=responseRobot.converse(entities)
+            console.log(responseRobot.stage)
             if(responseRobot.stage == 999){
               responseRobot=require('./response/conversation')
             }
