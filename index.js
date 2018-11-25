@@ -213,8 +213,8 @@ app.post('/webhook', (req, res) => {
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
               if(responseRobot._order.whatIsNotFilled()==0){
-                let l=responseRobot._order.dishlist
-                for(i=0;i<l.length;i++){
+                let e=responseRobot._order.dishlist
+                for(i=0;i<e.length;i++){
                   if(e[i].type=='Burger'){
                     if(e[i].if_combo==1){
                       let burgerName=e[i].food_type;
