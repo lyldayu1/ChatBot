@@ -188,6 +188,7 @@ app.post('/webhook', (req, res) => {
       let event = req.body.entry[0].messaging[i]
       let sender = event.sender.id
       sqltimestamp=event.timestamp;
+      sqltimestamp=sqltimestamp/1000
       sqlsender=sender;
       if (event.message && event.message.text) {
         let text = event.message.text;
