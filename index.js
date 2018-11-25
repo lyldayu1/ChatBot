@@ -214,37 +214,38 @@ app.post('/webhook', (req, res) => {
             if(responseRobot.stage == 999){
               if(responseRobot._order.whatIsNotFilled()==0){
                 let l=responseRobot._order.dishlist
-                for e in l:
-                  if(e.type=='Burger'){
-                    if(e.if_combo==1){
-                      let burgerName=e.food_type;
+                for(i=0;i<l.length;i++){
+                  if(e[i].type=='Burger'){
+                    if(e[i].if_combo==1){
+                      let burgerName=e[i].food_type;
                       let comboName=burgerName+" Combo";
                       insertOrder(sender,sqltimestamp,1,indexs[comboName],prices[comboName],'');
                     }else{
-                      let burgerName=e.food_type;
+                      let burgerName=e[i].food_type;
                       insertOrder(sender,sqltimestamp,1,indexs[burgerName],prices[burgerName],'');
                     }
-                  }else if(e.type=='Fries'){
+                  }else if(e[i].type=='Fries'){
                     insertOrder(sender,sqltimestamp,1,3,1.6,'');
-                  }else if(e.type=='Drink'){
-                    if(e.size==0){
+                  }else if(e[i].type=='Drink'){
+                    if(e[i].size==0){
                       insertOrder(sender,sqltimestamp,7,1.5,'');
-                    }else if(e.size==1){
+                    }else if(e[i].size==1){
                       insertOrder(sender,sqltimestamp,8,1.65,'');
-                    }else if(e.size==2){
+                    }else if(e[i].size==2){
                       insertOrder(sender,sqltimestamp,9,1.85,'');
                     }else{
                       insertOrder(sender,sqltimestamp,10,2.05,'');
                     }
-                  }else if(e.type=='UnsizeableDrink'){
-                    if(e.drink_type=='Shakes'){
+                  }else if(e[i].type=='UnsizeableDrink'){
+                    if(e[i].drink_type=='Shakes'){
                       insertOrder(sender,sqltimestamp,11,2.15,'');
-                    }else if(e.drink_type=='Milk'){
+                    }else if(e[i].drink_type=='Milk'){
                       insertOrder(sender,sqltimestamp,12,0.99,'');
-                    }else if(e.drink_type=='Coffee'){
+                    }else if(e[i].drink_type=='Coffee'){
                       insertOrder(sender,sqltimestamp,13,1.35,'');
                     }
                   }
+                }
               }
               console.log("renew robot")
               responseRobot=responseRobot.renew()
