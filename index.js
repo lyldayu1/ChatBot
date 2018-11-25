@@ -213,7 +213,7 @@ app.post('/webhook', (req, res) => {
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
               if(responseRobot._order.whatIsNotFilled()==0){
-                val l=responseRobot._order.dishlist
+                let l=responseRobot._order.dishlist
                 for e in l:
                   if(e.type=='Burger'){
                     if(e.if_combo==1){
