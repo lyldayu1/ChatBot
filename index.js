@@ -28,7 +28,7 @@ const findOrCreateSession = (fbid) => {
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
     // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. Would you like to make an order, make a reservation, request restaurant info, or give us feedbacks?")
+    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
   return sessionId;
@@ -75,6 +75,39 @@ app.listen(process.env.PORT || 3000, () => console.log('webhook is listening'));
 // });
 // }
 
+var prices={
+  "Hamburger": 2.1,
+  "Cheeseburger": 2.4,
+  "Double-Double Burger": 3.45,
+  "French Fries": 1.6,
+  "Hamburger Combo": 5.35,
+  "Cheeseburger Combo": 5.65,
+  "Double-Double Burger Combo": 6.7,
+  "Small Soft Drink": 1.5,
+  "Medium Soft Drink": 1.65,
+  "Large Soft Drink": 1.85,
+  "Extra Large Soft Drink": 2.05,
+  "Shakes": 2.15,
+  "Milk": 0.99,
+  "Coffee": 1.35
+}
+var indexs={
+  "Hamburger": 0,
+  "Cheeseburger": 1,
+  "Double-Double Burger": 2,
+  "French Fries": 3,
+  "Hamburger Combo": 4,
+  "Cheeseburger Combo": 5,
+  "Double-Double Burger Combo": 6,
+  "Small Soft Drink": 7,
+  "Medium Soft Drink": 8,
+  "Large Soft Drink": 9,
+  "Extra Large Soft Drink": 10,
+  "Shakes": 11,
+  "Milk": 12,
+  "Coffee": 13
+}
+
 function connectSql(UID,Time,Content){
   pool.getConnection(function(err,con) {
   if (err){
@@ -93,6 +126,23 @@ function connectSql(UID,Time,Content){
 });
 }
 
+function insertOrder(UID,Time,Quantity,FoodType,Price,Options){
+  pool.getConnection(function(err,con) {
+  if (err){
+    console.log(err);
+  }else{
+    console.log("Connected!")
+    var sql="INSERT INTO Orders (UID,Time, Quantity,FoodType,Price,Options) VALUE ("+UID+","+Time+","+Quantity+","+FoodType+","+Price+",'"+Options+"')";
+    con.query(sql,function(err,result){
+      con.release();
+      if(err){
+        throw err;
+      }
+      console.log("record inserted");
+    });
+  }
+});
+}
 
 
 // Adds support for GET requests to our webhook
@@ -162,6 +212,40 @@ app.post('/webhook', (req, res) => {
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
+              if(responseRobot._order.whatIsNotFilled()==0){
+                val l=responseRobot._order.dishlist
+                for e in l:
+                  if(e.type=='Burger'){
+                    if(e.if_combo==1){
+                      let burgerName=e.food_type;
+                      let comboName=burgerName+" Combo";
+                      insertOrder(sender,sqltimestamp,1,indexs[comboName],prices[comboName],'');
+                    }else{
+                      let burgerName=e.food_type;
+                      insertOrder(sender,sqltimestamp,1,indexs[burgerName],prices[burgerName],'');
+                    }
+                  }else if(e.type=='Fries'){
+                    insertOrder(sender,sqltimestamp,1,3,1.6,'');
+                  }else if(e.type=='Drink'){
+                    if(e.size==0){
+                      insertOrder(sender,sqltimestamp,7,1.5,'');
+                    }else if(e.size==1){
+                      insertOrder(sender,sqltimestamp,8,1.65,'');
+                    }else if(e.size==2){
+                      insertOrder(sender,sqltimestamp,9,1.85,'');
+                    }else{
+                      insertOrder(sender,sqltimestamp,10,2.05,'');
+                    }
+                  }else if(e.type=='UnsizeableDrink'){
+                    if(e.drink_type=='Shakes'){
+                      insertOrder(sender,sqltimestamp,11,2.15,'');
+                    }else if(e.drink_type=='Milk'){
+                      insertOrder(sender,sqltimestamp,12,0.99,'');
+                    }else if(e.drink_type=='Coffee'){
+                      insertOrder(sender,sqltimestamp,13,1.35,'');
+                    }
+                  }
+              }
               console.log("renew robot")
               responseRobot=responseRobot.renew()
             }
