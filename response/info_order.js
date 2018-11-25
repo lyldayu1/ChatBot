@@ -30,6 +30,8 @@ const SIZE_CORRESPOND_DRINK = {
     "large": 2,
     "extra large": 3
 }
+const YES = "yes"
+const NO = "no"
 
 module.exports = class Order {
     /** Consists of an order.
@@ -154,6 +156,18 @@ module.exports = class Order {
         var food = this.dishlist[index]
         var food_type = food.food_type
         if ((BURGER.has(food_type)) || (BURGER_COMBO.has(food_type))) {
+            if (("conversationEnd" in recv) && (Object.keys(recv).length == 1)) {
+                var dish_index, attr_index = this.whatIsNotFilled()
+                if (recv.conversationEnd[0].value == YES) {
+                    this.dishlist[index].indexFill(attr_index, 1)
+                } else if (recv.conversationEnd[0].value == NO) {
+                    this.dishlist[index].indexFill(attr_index, 0)
+                } else {
+                    throw "fill cannot parse conversationEnd of value " + 
+                          recv.conversationEnd[0].value
+                }
+                return 0
+            }
             if ("food_type" in recv) {
                 var recv_food_type = recv.food_type
                 for (var i = 0; i < recv_food_type.length; i ++) {
@@ -220,7 +234,7 @@ class Burger {
      *  @param {boolean} this.if_combo:
      *      false = No, true = Yes
      *  @param {integer} this.onion:
-     *      0 = No, 1 = Yes, 2 = Extra (default = 1)
+     *      0 = No, 1 = Yes, 2 = Extra
      *  @param {integer} this.lettuce:
      *      0 = No, 1 = Yes, 2 = Extra (default = 1)
      *  @param {integer} this.tomato:
@@ -232,6 +246,7 @@ class Burger {
                 onion=null,
                 lettuce=1,
                 tomato=1) {
+        this.type = "Burger"
         this.food_type = food_type
         this.if_combo = if_combo
         this.onion = onion
@@ -248,10 +263,6 @@ class Burger {
     }
 
     customerReport() {
-        var combo = ""
-        if (this.if_combo == 1) {
-            combo = " combo"
-        }
         var onion = ""
         if (this.onion == 0) {
             onion = "without onion"
@@ -260,8 +271,23 @@ class Burger {
         } else {
             onion = "with extra onion"
         }
-        var text = String(this.food_type) + combo + ", " + onion + "."
+        var text = String(this.food_type) + ", " + onion + "."
         return text
+    }
+
+    indexFill(attr_index, value) {
+        if (attr_index == 1) {
+            this.food_type = value
+        } else if (attr_index == 2) {
+            this.if_combo = value
+        } else if (attr_index == 3) {
+            this.onion = value
+        } else if (attr_index == 4) {
+            this.lettuce = value
+        } else if (attr_index == 5) {
+            this.tomato = value
+        }
+        return
     }
 
     whatIsNotFilled() {
@@ -289,7 +315,9 @@ class Fries {
      *  Empty class since we don't really have any fries attributes.
      */
 
-    constructor() {}
+    constructor() {
+        this.type = "Fries"
+    }
 
     print() {
         return "Fries."
@@ -311,6 +339,7 @@ class Drink {
      */
 
     constructor(size=null) {
+        this.type = "Drink"
         this.size = size
     }
 
@@ -341,19 +370,20 @@ class UnsizeableDrink {
         if (type == null) {
             console.log("UnsizeableDrink type cannot be null")
         }
-        this.type = type
+        this.type = "UnsizeableDrink"
+        this.drink_type = type
     }
 
     print() {
-        return this.type + "."
+        return this.drink_type + "."
     }
 
     customerReport() {
-        return this.type + "."
+        return this.drink_type + "."
     }
 
     whatIsNotFilled() {
-        if (this.type == null) {
+        if (this.drink_type == null) {
             return 1
         }
         return 0

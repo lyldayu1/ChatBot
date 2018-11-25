@@ -109,7 +109,7 @@ class Conversation {
          *      Status code and the response text from _converse().
          *      Will return status code -1 if this.stage == 999.
          */
-         console.log("success!!!")
+        console.log("success!!!")
         if (this.stage == 999) {
             return (-1, "")
         } else {
@@ -404,7 +404,7 @@ class Conversation {
             }
         } else {
             throw "conversationEnd not in recv" + 
-            recv.conversationEnd[0].value
+                  recv.conversationEnd[0].value
         }
     }
 }
