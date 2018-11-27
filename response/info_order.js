@@ -13,17 +13,22 @@
 
 // MACROS:
 // WIT.AI MACROS
-const BURGER = new Set(["Hamburger", "Cheeseburger", "Double-Double Burger"])
-const BURGER_COMBO = new Set(["Hamburger Combo",
-                            "Cheeseburger Combo",
-                            "Double-Double Burger Combo"])
+const BURGER = ["Hamburger",
+                "Cheeseburger",
+                "Double-Double Burger"]
+const BURGER_COMBO = ["Hamburger Combo",
+                      "Cheeseburger Combo",
+                      "Double-Double Burger Combo"]
+const FRIES = "French Fries"
+const DRINK = "Drink"
+const UNSIZEABLE_DRINK = ["Milk",
+                          "Coffee",
+                          "Shake"]
 const COMBO = "Combo"
+const SANDWICH = "Sandwich"
 const ONION = ["no onion", "onion", "extra onion"]
 const LETTUCE = ["no lettuce", "lettuce", "extra lettuce"]
 const TOMATO = ["no tomato", "tomato", "extra tomato"]
-const FRIES = "French Fries"
-const DRINK = "Drink"
-const UNSIZEABLE_DRINK = new Set(["Milk", "Coffee", "Shake"])
 const SIZE_CORRESPOND_DRINK = {
     "small": 0,
     "medium": 1,
@@ -47,9 +52,9 @@ module.exports = class Order {
         if (this.dishlist.length == 0) {
             return "Order is empty."
         } else {
-            var text = "Order has " + this.dishlist.length.toString() + " dish(es).\n"
+            var text = "Order includes " + this.dishlist.length.toString() + " dish(es).\n"
             for (var i = 0; i < this.dishlist.length; i ++) {
-                text = text + "Dish No. " + i.toString() + "\n"
+                text = text + "Dish No. " + (i+1).toString() + "\n"
                 text = text + this.dishlist[i].print()
             }
             return text
@@ -68,10 +73,13 @@ module.exports = class Order {
                 temp_text = temp_text.substring(0,
                                                 temp_text.length - 1)
                 text = text + temp_text + ", "
+                continue
             } else if (i == this.dishlist.length - 1) {
                 temp_text = temp_text.charAt(0).toLowerCase() +
                             temp_text.slice(1)
                 temp_text = "and " + temp_text
+                text = text + temp_text
+                break
             } else {
                 temp_text = temp_text.substring(0,
                                                 temp_text.length - 1)
@@ -80,7 +88,7 @@ module.exports = class Order {
                 text = text + temp_text + ", "
             }
         }
-        return temp_text
+        return text
     }
 
     whatIsNotFilled() {
@@ -106,7 +114,7 @@ module.exports = class Order {
         if ("food_type" in recv) {
             var food_type = recv.food_type
             var temp_food = food_type[0].value
-            if ((BURGER.has(temp_food)) || (BURGER_COMBO.has(temp_food))) {
+            if ((BURGER.includes(temp_food)) || (BURGER_COMBO.includes(temp_food))) {
                 // TODO: Redesign combo compatibility, support other food types
                 if (!("burger_type" in recv)) {
                     this.dishlist.push(new Burger(temp_food)) 
@@ -115,7 +123,7 @@ module.exports = class Order {
                 var burger_type = recv.burger_type
                 var onion = null, lettuce = 1, tomato = 1
                 var combo = null
-                if (BURGER_COMBO.has(temp_food)){
+                if (BURGER_COMBO.includes(temp_food)){
                     var combo = 1
                 }
                 for (var i = 0; i < burger_type.length; i ++) {
@@ -138,7 +146,7 @@ module.exports = class Order {
                 var drink_size = null
                 this.dishlist.push(new Drink(drink_size))
                 return 0
-            } else if (UNSIZEABLE_DRINK.has(temp_food)) {
+            } else if (UNSIZEABLE_DRINK.includes(temp_food)) {
                 var drink_type = null
                 this.dishlist.push(new UnsizeableDrink(drink_type))
                 return 0
@@ -155,13 +163,13 @@ module.exports = class Order {
         // Given index, fill dish
         var food = this.dishlist[index]
         var food_type = food.food_type
-        if ((BURGER.has(food_type)) || (BURGER_COMBO.has(food_type))) {
+        if ((BURGER.includes(food_type)) || (BURGER_COMBO.includes(food_type))) {
             if (("conversationEnd" in recv) && (Object.keys(recv).length == 1)) {
-                var dish_index, attr_index = this.whatIsNotFilled()
+                var _, attr_index = this.whatIsNotFilled()
                 if (recv.conversationEnd[0].value == YES) {
-                    this.dishlist[index].indexFill(attr_index, 1)
+                    food.indexFill(attr_index, 1)
                 } else if (recv.conversationEnd[0].value == NO) {
-                    this.dishlist[index].indexFill(attr_index, 0)
+                    food.indexFill(attr_index, 0)
                 } else {
                     throw "fill cannot parse conversationEnd of value " + 
                           recv.conversationEnd[0].value
@@ -172,7 +180,10 @@ module.exports = class Order {
                 var recv_food_type = recv.food_type
                 for (var i = 0; i < recv_food_type.length; i ++) {
                     if (recv_food_type[i].value == COMBO){
-                        food.if_combo = 1
+                        this._convertToCombo(food)
+                    }
+                    if (recv_food_type[i].value == SANDWICH) {
+                        this._convertToSandwich(food)
                     }
                 }
             }
@@ -193,7 +204,7 @@ module.exports = class Order {
             return 0
         } else if (food_type == DRINK) {
             return 0
-        } else if (UNSIZEABLE_DRINK.has(food_type)) {
+        } else if (UNSIZEABLE_DRINK.includes(food_type)) {
             return 0
         } else {
             console.log("Bot confused at Order.fill()")
@@ -223,6 +234,41 @@ module.exports = class Order {
                 return match
             }
         }
+    }
+
+    _convertToCombo(dish) {
+        /* Directly change combo related attributes
+         * that is, dish.food_type and dish.if_combo
+         * USE THIS FUNCTION TO MAKE COMBO RELATED CHANGES ONLY!
+         */
+        if (BURGER.includes(dish.food_type)) {
+            dish.food_type = BURGER_COMBO[BURGER.indexOf(dish.food_type)]
+            dish.if_combo = 1
+            return 0
+        } else {
+            console.log("ERROR: in _convertToCombo: " +
+                        "food_type not in BURGER.")
+            return 1
+        }
+    }
+
+    _convertToSandwich(dish) {
+        /* (Mostly obselete but implemented anyway)
+         * Directly change combo related attributes
+         * that is, dish.food_type and dish.if_combo
+         * USE THIS FUNCTION TO MAKE COMBO RELATED CHANGES ONLY!
+         */
+
+         // Check if food_type in combo (BURGER_COMBO)
+         if (BURGER_COMBO.includes(dish.food_type)) {
+             dish.food_type = BURGER[BURGER_COMBO.indexOf(dish.food_type)]
+             dish.if_combo = 0
+             return 0
+         } else {
+             console.log("ERROR: in _convertToSandwich: " +
+                         "food_type not in BURGER_COMBO.")
+             return 1
+         }
     }
 }
 
@@ -259,7 +305,7 @@ class Burger {
                + "If combo: " + String(this.if_combo) + "\n"
                + "Onion: " + String(this.onion) + "\n"
                + "Lettuce: " + String(this.lettuce) + "\n"
-               + "Tomato: " + String(this.tomato) + "."
+               + "Tomato: " + String(this.tomato) + "." + "\n"
     }
 
     customerReport() {
