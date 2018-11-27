@@ -109,7 +109,7 @@ class Conversation {
          *      Status code and the response text from _converse().
          *      Will return status code -1 if this.stage == 999.
          */
-        console.log("success!!!")
+        // console.log("success!!!")
         if (this.stage == 999) {
             return (-1, "")
         } else {
@@ -144,7 +144,7 @@ class Conversation {
             this._bot_confused == true
         }
         if (res != 0) {
-            console.log("ERROR: At primary stage " + toString(primary_stage))
+            console.log("ERROR: At stage " + String(this.stage))
             console.log("ERROR: Converse function returns non-zero.")
             this._bot_confused == true
         }
@@ -167,7 +167,7 @@ class Conversation {
             return 1, text
         }
         if (res != 0) {
-            console.log("ERROR: At primary stage " + toString(primary_stage))
+            console.log("ERROR: At stage " + String(this.stage))
             console.log("ERROR: Converse function returns non-zero.")
             return 1, text
         }
@@ -179,7 +179,7 @@ class Conversation {
             // Make order (201 - 203, 209)
             // 201 = Require food type
             // 202 = Require additional info
-            // 203 = Require confirmation
+            // 203 = Require confirmation (REMOVED)
             var res = 0
             res = this._order.addFill(recv)
             if (res == 1) {
@@ -191,7 +191,7 @@ class Conversation {
                 this.stage = 202
                 return 0
             } else {
-                this.stage = 203
+                this.stage = 209
                 return 0
             }
         } else if (RESERVE in recv) {
@@ -236,7 +236,7 @@ class Conversation {
             // Make order (201 - 203, 209)
             // 201 = Require food type
             // 202 = Require additional info
-            // 203 = Require confirmation
+            // 203 = Require confirmation (REMOVED!)
             // 209 = Ask for more dishes
             if (progress_stage == 1) {
                 var res = 0
@@ -249,35 +249,32 @@ class Conversation {
                 if (res != (this._dishno, 0)) {
                     this.stage = 202
                 } else {
-                    this.stage = 203
+                    this.stage = 209
                 }
                 return 0
             } else if (progress_stage == 2) {
                 this._order.fill(this._dishno, recv)
                 var res = this._order.whatIsNotFilled()
                 if (res == (this._dishno, 0)) {
-                    this.stage = 203
-                }
-                return 0
-            } else if (progress_stage == 3) {
-                // TODO: change dish content
-                if (this._yn_parsing(recv) == true) {
                     this.stage = 209
-                } else {
-                    this.stage = 203
                 }
                 return 0
             } else if (progress_stage == 9) {
-                if (this._yn_parsing(recv) == false) {
+                var yn = this._yn_parsing(recv)
+                if (yn == 0) {
                     if (this._order.dishlist.length > 1) {
                         this.stage = 301
                     } else {
                         this.stage = 302
                     }
-                } else {
+                } else if (yn == 1) {
                     this._multiple_dish_flag = true
                     this._dishno = this._dishno + 1
                     this.stage = 201
+                } else {
+                    // BOT CONFUSED
+                    this._bot_confused = true
+                    return 0
                 }
                 return 0
             }
@@ -305,7 +302,7 @@ class Conversation {
             this.stage = 239
             return 0
         } else {
-            // Bot is confused, stage stays at the current stage
+            // BOT CONFUSED
             this._bot_confused = true
             return 0
         }
@@ -315,18 +312,26 @@ class Conversation {
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
             // TODO: change order
-            if (this._yn_parsing(recv) == true) {
+            var yn = this._yn_parsing(recv)
+            if (yn == 1) {
                 this.stage = 302
-            } else {
+            } else if (yn == 0) {
                 this.stage = 301
+            } else {
+                // BOT CONFUSED
+                this._bot_confused = true
             }
             return 0
         } else if (progress_stage == 2) {
             // TODO: special instructions, do not need to confirm
-            if (this._yn_parsing(recv) == false) {
+            var yn = this._yn_parsing(recv)
+            if (yn == 0) {
+                this.stage = 999
+            } else if (yn == 1) {
                 this.stage = 999
             } else {
-                this.stage = 999
+                // BOT CONFUSED
+                this._bot_confused = true
             }
             return 0
         } else {
@@ -386,7 +391,7 @@ class Conversation {
     _response_ps3(recv) {
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
-            return 0, ORDER_CONFIRM + this._order.print()
+            return 0, ORDER_CONFIRM + this._order.customerReport()
         } else if (progress_stage == 2) {
             return 0, SPECIAL_INST
         }
@@ -395,26 +400,25 @@ class Conversation {
     _yn_parsing(recv) {
         if (YN_LIST in recv) {
             if (recv.conversationEnd[0].value == YES) {
-                return true
+                return 1
             } else if (recv.conversationEnd[0].value == NO) {
-                return false
+                return 0
             } else {
-                throw "_yn_parsing cannot parse value " + 
-                      recv.conversationEnd[0].value
+                console.log("ERROR: _yn_parsing cannot parse value " + 
+                            recv.conversationEnd[0].value)
+                return -1
             }
         } else {
-            throw "conversationEnd not in recv" + 
-                  recv.conversationEnd[0].value
+            console.log("ERROR: in _yn_parsing, conversationEnd not in recv")
+            return -1
         }
     }
-    renew(){
+
+    renew() {
         return new Conversation();
     }
 }
 
 
-
-
-//var c = new Conversation()
 module.exports=new Conversation()
 
