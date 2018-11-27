@@ -8,14 +8,7 @@
 const Conversation = require('./conversation')
 
 var l = [
-    "Order food.",
-    "Burger",
-    "combo",
-    "yes",
-    "yes",
-    "a fries",
-    "no",
-    "yes",
+    "i want cheeseburger",
     "no"
 ]
 
@@ -32,9 +25,9 @@ async function interpret(l) {
     for (var i = 0; i < l.length; i ++) {
         s = l[i]
         let ret = await wit.message(s).then(({entities}) => {
-            // console.log(entities)
             console.log("USER: " + s)
             console.log(" BOT: " + Conversation.converse(entities))
+            console.log(Conversation.stage)
         })
         .catch((err) => {
             console.error('Error from Wit: ', err.stack || err);
@@ -44,4 +37,4 @@ async function interpret(l) {
 }
 
 console.log(" BOT: Hi. This is WaitressX. What do you need today?")
-interpret(l)
+//interpret(l)
