@@ -7,17 +7,33 @@ const randomArrayPicker = require('./random_picker')
 var ordering_food_type = [
     "What would you like to have today?",
     "What can I get for you today?",
-    "What can I get for you?"
+    "What can I get for you?",
+    "What would you like to order?",
+    "What would you like to eat?",
+    "How can I help you with your order?"
 ]
 var ordering_food_type_another = [
-    "What else?",
-    "What else do you need?"
+    //ZLI: eventually, this and above are the same right?
+    //"What else?",
+    //"What else do you need?",
+    "What you like to order?",
+    "What would you like to order?",
+    "What can I get for you?",
+    "What would you like to eat?",
+    "How can I help you with your order?"
 ]
 var ordering_combo = [
-    "Would like to make it a combo?"
+    "Would you like to make it a combo?",
+    "Woud it be a combo?",
+    "Would you want it to be combo?",
+    "Do you want combo?"
 ]
 var ordering_onions = [
-    "With or without onions?"
+    "With or without onions?",
+    "Do you want onions?",
+    "Would it be OK to have onions?",
+    "Onions?"
+    
 ]
 var ordering_confirmation = [ // Special, do not change
     "Gotcha. ",
@@ -26,7 +42,10 @@ var ordering_confirmation = [ // Special, do not change
 ]
 var ordering_else = [
     "Anything else?",
-    "Need anything else?"
+    "Need anything else?",
+    "Would you like to place another orders?",
+    "Is that all?",
+    "Anything else for you?"
 ]
 
 // Generate response
