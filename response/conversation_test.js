@@ -9,11 +9,19 @@
  *     Second line to EOF: Sequential attributes for functionality
  *                         or attributes for each dish
  * 
+ * Dependencies:
+ *     expect: npm install chai
  * Run with "node conversation_test"
  */
 
-const conversation_module = require('./conversation')
+ // Modules
+const _restaurant_data_module = require('./info_restaurant')
+const _order_data_module = require('./info_order')
+const _reservation_data_module = require('./info_reservation')
+const _feedback_data_module = require('./info_feedback')
 const fs = require('fs')
+const chai = require('chai')
+var expect = chai.expect
 
 // Setting up our bot
 let Wit = require('node-wit').Wit
@@ -23,6 +31,25 @@ const wit = new Wit({
     accessToken: WitToken,
     logger: new log.Logger(log.INFO)
 })
+
+class MockConversation {
+    /* Mock Conversation class that stores reference values.
+     * As per design I can only hold one Conversation instance.
+     * So that you know the intention of this class.
+     */
+
+    constructor() {
+        this.stage = 101
+        this._id = Math.floor(Math.random()*1000000)
+        this._restaurant = new _restaurant_data_module()
+        this._order = new _order_data_module()
+        this._dishno = 0
+        this._reservation = new _reservation_data_module()
+        this._feedback = new _feedback_data_module()
+        this._multiple_dish_flag = false
+        this._bot_confused = false
+    }
+}
 
 function readOriginalMessages(file) {
     // read customer response line by line
@@ -50,6 +77,15 @@ function readCorrectConversation(reference_conversation_file,
     // Read and parse the expected conversation output file
     // return a pre-constructed order
     reference_conversation.stage = 999
+    var text = fs.readFileSync(reference_conversation_file).toString()
+    var textByLine = text.split("\n")
+    var firstLine = textByLine[0].split(", ")
+    var signal = firstLine[0]
+    var ttn = firstLine[1]
+    for (var i = 1; i < textByLine.length; i ++) {
+        var currentLine = textByLine[i].split(", ")
+        console.log(currentLine)
+    }
     return 0
 }
 
@@ -114,14 +150,16 @@ function validateConversation(signal, test_c, ref_c) {
 
 function conversationTest(original_messages_file,
                           reference_conversation_file) {
-    // Do the conversation
-    var orig_messages = readOriginalMessages(original_messages_file)
-    var test_conversation = new conversation_module()
-    botProcessing(orig_messages, test_conversation)
     // Validate conversation to reference
-    var reference_conversation = new conversation_module()
-    var signal = readCorrectConversation(reference_conversation_file,
+    var reference_conversation = new MockConversation()
+    var signal = readCorrectConversation('./conversation_tests/validations/' +
+                                         reference_conversation_file,
                                          reference_conversation)
+    // Do the conversation
+    var orig_messages = readOriginalMessages('./conversation_tests/messages/' +
+                                             original_messages_file)
+    const test_conversation = require('./conversation')
+    botProcessing(orig_messages, test_conversation)
     var res = validateConversation(signal,
                                    test_conversation,
                                    reference_conversation)

@@ -26,15 +26,19 @@ const UNSIZEABLE_DRINK = ["Milk",
                           "Shake"]
 const COMBO = "Combo"
 const SANDWICH = "Sandwich"
-const ONION = ["no onion", "onion", "extra onion"]
-const LETTUCE = ["no lettuce", "lettuce", "extra lettuce"]
-const TOMATO = ["no tomato", "tomato", "extra tomato"]
-const SIZE_CORRESPOND_DRINK = {
-    "small": 0,
-    "medium": 1,
-    "large": 2,
-    "extra large": 3
-}
+const ONION = ["no onion",
+               "onion",
+               "extra onion"]
+const LETTUCE = ["no lettuce",
+                 "lettuce",
+                 "extra lettuce"]
+const TOMATO = ["no tomato",
+                "tomato",
+                "extra tomato"]
+const DRINK_SIZE = ["small",
+                    "medium",
+                    "large",
+                    "extra large"]
 const YES = "yes"
 const NO = "no"
 
@@ -144,11 +148,13 @@ module.exports = class Order {
                 return 0
             } else if (temp_food == DRINK) {
                 var drink_size = null
+                if ("size_type" in recv) {
+                    drink_size = DRINK_SIZE.indexOf(recv.size_type[0].value)
+                }
                 this.dishlist.push(new Drink(drink_size))
                 return 0
             } else if (UNSIZEABLE_DRINK.includes(temp_food)) {
-                var drink_type = null
-                this.dishlist.push(new UnsizeableDrink(drink_type))
+                this.dishlist.push(new UnsizeableDrink(temp_food))
                 return 0
             } else {
                 console.log("Bot confused at Order.addFill()")
@@ -201,10 +207,17 @@ module.exports = class Order {
             }
             return 0
         } else if (food_type == FRIES) {
-            return 0
+            // nothing to do here
+            return 0 
         } else if (food_type == DRINK) {
+            var drink_size = null
+            if ("size_type" in recv) {
+                drink_size = DRINK_SIZE.indexOf(recv.size_type[0].value)
+            }
+            food.drink_size = drink_size
             return 0
         } else if (UNSIZEABLE_DRINK.includes(food_type)) {
+            // nothing to do here since type is predetermined in addFill()
             return 0
         } else {
             console.log("Bot confused at Order.fill()")
@@ -275,6 +288,8 @@ module.exports = class Order {
 
 class Burger {
     /** Burger and burger combo class:
+     *  @param {string} this.type:
+     *      stores class name
      *  @param {string} this.food_type:
      *      class variable that stores the stage of the conversation.
      *  @param {boolean} this.if_combo:
@@ -359,6 +374,8 @@ class Burger {
 class Fries {
     /** Fries:
      *  Empty class since we don't really have any fries attributes.
+     *  @param {string} this.type:
+     *      stores class name
      */
 
     constructor() {
@@ -380,6 +397,8 @@ class Fries {
 
 class Drink {
     /** Burger and burger combo class:
+     *  @param {string} this.type:
+     *      stores class name
      *  @param {integer} this.size:
      *      0 = Small, 1 = Medium, 2 = Large, 3 = Extra Large
      */
@@ -394,7 +413,13 @@ class Drink {
     }
 
     customerReport() {
-        return "Fountain drink of size " + String(this.size) + "."
+        var size_correspond = {
+            0: "small",
+            1: "medium",
+            2: "large",
+            3: "extra large"
+        }
+        return size_correspond[this.size] + " fountain drink."
     }
 
     whatIsNotFilled() {
@@ -407,7 +432,9 @@ class Drink {
 
 class UnsizeableDrink {
     /** For milk, coffee, and shake:
-     *  @param {integer} this.type:
+     *  @param {string} this.type:
+     *      stores class name
+     *  @param {integer} this.drink_type:
      *      valid value in UNSIZEABLE_DRINK
      *      must be filled upon instantiation
      */

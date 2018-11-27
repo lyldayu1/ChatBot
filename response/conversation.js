@@ -36,11 +36,12 @@ const _order_data_module = require('./info_order')
 const _reservation_data_module = require('./info_reservation')
 const _feedback_data_module = require('./info_feedback')
 // Response Modules
-const _greetings_resp_module = require('./resp_greetings')
 const _order_resp_module = require('./resp_order')
 const _reservation_resp_module = require('./resp_reservation')
 const _feedback_resp_module = require('./resp_feedback')
 const _restaurant_resp_module = require('./resp_restaurant')
+// Random Array Picker
+const randomArrayPicker = require('./random_picker')
 
 
 // MACROS:
@@ -53,11 +54,37 @@ const YN_LIST = "conversationEnd"
 const YES = "yes"
 const NO = "no"
 // RESP_MACROS
-const APPEND_CONFIRM = " Is that right?"
-const ORDER_CONFIRM = "Please confirm your order: \n"
-const SPECIAL_INST = "Any special instructions related to your order?"
-const ORDER_FINISHED = "Order Finished!"
-const BOT_CONFUSED = "I am sorry. But I do not understand."
+const ORDER_CONFIRM = [
+    // Do not forget the ending whitespace
+    // followed by Order.curstomerReport()
+    "Please confirm your order: ",
+    "Your order is: ",
+    "Here is your order: ",
+    "Let me reiterate your order: "
+]
+const APPEND_CONFIRM = [
+    // Do not forget the starting whitespace
+    // preceded by Order.customerReport()
+    " Is that right?",
+    " Would that be right?",
+    " Everything correct?"
+]
+const SPECIAL_INST = [
+    "Do you need any sauces? More ketchup packets?",
+    "Need any sauces? Or more ketchup packets?"
+]
+const ORDER_FINISHED = [
+    "Thank you so much! Your order is now finished!",
+    "Thank you for chatting with me! Your order is finished!",
+    "Thank you! Your order is finished!",
+    "Thanks! Your order is finished!"
+]
+const BOT_CONFUSED = [
+    "I'm so sorry. But I don't understand.",
+    "Beep boop, I am a bot.",
+    "Sorry, I am confused.",
+    "Sorry, I didn't get that."
+]
 
 
 class Conversation {
@@ -150,7 +177,7 @@ class Conversation {
         }
         if (this._bot_confused == true) {
             this._bot_confused = false
-            return 1, BOT_CONFUSED
+            return 1, randomArrayPicker(BOT_CONFUSED)
         }
         primary_stage = Math.floor(this.stage / 100)
         var text = ""
@@ -161,7 +188,7 @@ class Conversation {
         } else if (primary_stage == 3) {
             res, text = this._response_ps3(recv)
         } else if (primary_stage == 9) {
-            return -1, ORDER_FINISHED
+            return -1, randomArrayPicker(ORDER_FINISHED)
         } else {
             console.log("ERROR: Invalid primary stage number.")
             return 1, text
@@ -262,11 +289,7 @@ class Conversation {
             } else if (progress_stage == 9) {
                 var yn = this._yn_parsing(recv)
                 if (yn == 0) {
-                    if (this._order.dishlist.length > 1) {
-                        this.stage = 301
-                    } else {
-                        this.stage = 302
-                    }
+                    this.stage = 301
                 } else if (yn == 1) {
                     this._multiple_dish_flag = true
                     this._dishno = this._dishno + 1
@@ -370,7 +393,7 @@ class Conversation {
             } else {
                 text = text +
                        this._order.dishlist[this._dishno].customerReport() +
-                       APPEND_CONFIRM
+                       randomArrayPicker(APPEND_CONFIRM)
                 return res, text
             }
         } else if (secondary_stage == 1) {
@@ -391,9 +414,10 @@ class Conversation {
     _response_ps3(recv) {
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
-            return 0, ORDER_CONFIRM + this._order.customerReport()
+            return 0, randomArrayPicker(ORDER_CONFIRM) +
+                      this._order.customerReport()
         } else if (progress_stage == 2) {
-            return 0, SPECIAL_INST
+            return 0, randomArrayPicker(SPECIAL_INST)
         }
     }
 
@@ -420,5 +444,5 @@ class Conversation {
 }
 
 
-module.exports=new Conversation()
+module.exports = new Conversation()
 
