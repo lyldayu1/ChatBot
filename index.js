@@ -213,6 +213,7 @@ app.post('/webhook', (req, res) => {
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
+              console.log("DEBUG")
               if(responseRobot._order.whatIsNotFilled()==0){
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
