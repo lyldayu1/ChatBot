@@ -12,6 +12,7 @@ const WitToken = 'RRAEVMQZPZNVJ6P3X4XJMOT6SZTH3ONL'
 const sessions = {};
 var responseRobot=null;
 var flag=0
+var restartFlag = 0
 const findOrCreateSession = (fbid) => {
   //responseRobot=require('./response/conversation')
   let sessionId;
@@ -28,6 +29,13 @@ const findOrCreateSession = (fbid) => {
     flag=1
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
+    // Send the first message to user
+    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    console.log("sender: " + fbid)
+  }
+  if(sessionId && flag === 0 && restartFlag === 1)
+  {
+    flag = 1
     // Send the first message to user
     sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
     console.log("sender: " + fbid)
@@ -212,6 +220,7 @@ app.post('/webhook', (req, res) => {
         const sessionId = findOrCreateSession(sender);
         if(flag==1){
           flag=0;
+          restartFlag = 0
         }else{
 
           wit.message(text).then(({entities}) => {
@@ -226,6 +235,7 @@ app.post('/webhook', (req, res) => {
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
+              restartFlag = 1
               if(responseRobot._order.whatIsNotFilled()==0){
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
