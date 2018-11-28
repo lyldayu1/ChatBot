@@ -32,6 +32,13 @@ const findOrCreateSession = (fbid) => {
     sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
+  if(sessionId && flag === 0)
+  {
+    flag = 1
+    // Send the first message to user
+    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    console.log("sender: " + fbid)
+  }
   return sessionId;
 };
 
