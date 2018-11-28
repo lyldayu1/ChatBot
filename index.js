@@ -109,6 +109,9 @@ var indexs={
 }
 
 function connectSql(UID,Time,Content){
+  if(UID != 2553286658045470) {
+    return;
+  }
   pool.getConnection(function(err,con) {
   if (err){
     console.log(err);
