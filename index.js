@@ -136,7 +136,7 @@ function insertOrder(UID,Time,Quantity,FoodType,Price,Options){
     console.log(err);
   }else{
     console.log("in insertOrder(): Connected!")
-    console.log("UID = " + UID + ", Time = " + Time + ", Quantity = " + Quantity + ", FoodType = " + FoodType + ", Price = " + Price + ", Options = " + Options;
+    console.log("UID = " + UID + ", Time = " + Time + ", Quantity = " + Quantity + ", FoodType = " + FoodType + ", Price = " + Price + ", Options = " + Options);
     var sql="INSERT INTO Orders (UID,Time, Quantity,FoodType,Price,Options) VALUE ("+UID+","+Time+","+Quantity+","+FoodType+","+Price+",'"+Options+"')";
     con.query(sql,function(err,result){
       con.release();
