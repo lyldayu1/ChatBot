@@ -288,7 +288,7 @@ app.post('/webhook', (req, res) => {
 
 
 function sendTextMessage(sender,text) {
-    if(UID != UserID) {
+    if(sender != UserID) {
       return;
     }
     let messageData = { text:text }
