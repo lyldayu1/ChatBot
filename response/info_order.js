@@ -23,7 +23,7 @@ const FRIES = "French Fries"
 const DRINK = "Drink"
 const UNSIZEABLE_DRINK = ["Milk",
                           "Coffee",
-                          "Shake"]
+                          "Shakes"]
 const COMBO = "Combo"
 const SANDWICH = "Sandwich"
 const ONION = ["no onion",
@@ -76,20 +76,16 @@ module.exports = class Order {
             if (i == 0) {
                 temp_text = temp_text.substring(0,
                                                 temp_text.length - 1)
-                text = text + temp_text + ", "
+                text = text + temp_text + "; "
                 continue
             } else if (i == this.dishlist.length - 1) {
-                temp_text = temp_text.charAt(0).toLowerCase() +
-                            temp_text.slice(1)
                 temp_text = "and " + temp_text
                 text = text + temp_text
                 break
             } else {
                 temp_text = temp_text.substring(0,
                                                 temp_text.length - 1)
-                temp_text = temp_text.charAt(0).toLowerCase() +
-                            temp_text.slice(1)
-                text = text + temp_text + ", "
+                text = text + temp_text + "; "
             }
         }
         return text

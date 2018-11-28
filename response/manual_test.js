@@ -9,7 +9,16 @@ const Conversation = require('./conversation')
 
 var l = [
     "i want cheeseburger",
-    "no"
+    "no",
+    "no",
+    "i want burger",
+    "yes",
+    "yes",
+    "yes, i want a cheeseburger combo with extra tomato",
+    "extra onion",
+    "no thank you",
+    "thats correct",
+    "no thank you"
 ]
 
 // Setting up our bot (Wit.AI)
@@ -27,7 +36,7 @@ async function interpret(l) {
         let ret = await wit.message(s).then(({entities}) => {
             console.log("USER: " + s)
             console.log(" BOT: " + Conversation.converse(entities))
-            console.log(Conversation.stage)
+            // console.log(Conversation.stage)
         })
         .catch((err) => {
             console.error('Error from Wit: ', err.stack || err);
@@ -37,4 +46,4 @@ async function interpret(l) {
 }
 
 console.log(" BOT: Hi. This is WaitressX. What do you need today?")
-//interpret(l)
+interpret(l)
