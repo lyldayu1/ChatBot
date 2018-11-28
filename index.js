@@ -213,6 +213,8 @@ app.post('/webhook', (req, res) => {
         if(flag==1){
           flag=0;
         }else{
+	  console.log("Text" + text)
+	  console.log("entities: " + {entities})
           wit.message(text).then(({entities}) => {
           // You can customize your response to these entities
             console.log(entities);
