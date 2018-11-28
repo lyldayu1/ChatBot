@@ -233,7 +233,7 @@ app.post('/webhook', (req, res) => {
 	    console.log(entities)*/
 	    
             // For now, let's reply with another automatic message
-            let reponseText=responseRobot.converse(entities)
+            let reponseText=responseRobot.converse(entities, text)
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){

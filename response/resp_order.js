@@ -17,7 +17,6 @@ var ordering_food_type_another = [
     // order next dish
     "What else?",
     "What else do you need?",
-    "What you like to order next?",
     "What would you like to order next?"
 ]
 var ordering_combo = [

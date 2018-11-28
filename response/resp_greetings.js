@@ -19,8 +19,7 @@ var greeting_textbody = {
 }
 
 // Generate greetings
-//module.exports = 
-function generateGreetings() {
+module.exports = function generateGreetings() {
     // Choose timed_greet
     var date = new Date();
     var current_hour = date.getHours();
@@ -41,5 +40,3 @@ function generateGreetings() {
     // Return body
     return body.join(" ")
 }
-
-console.log(generateGreetings())
