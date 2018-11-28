@@ -192,7 +192,7 @@ app.post('/webhook', (req, res) => {
       let event = req.body.entry[0].messaging[i]
       let sender = event.sender.id
       if(sender != UserID) {
-        return;
+        continue;
       }
       sqltimestamp=event.timestamp;
       sqltimestamp=sqltimestamp/1000
