@@ -237,21 +237,21 @@ app.post('/webhook', (req, res) => {
                     insertOrder(sender,sqltimestamp,1,3,1.6,'');
                   }else if(e[i].type=='Drink'){
                     if(e[i].size==0){
-                      insertOrder(sender,sqltimestamp,7,1.5,'');
+                      insertOrder(sender,sqltimestamp,1,7,1.5,'');
                     }else if(e[i].size==1){
-                      insertOrder(sender,sqltimestamp,8,1.65,'');
+                      insertOrder(sender,sqltimestamp,1,8,1.65,'');
                     }else if(e[i].size==2){
-                      insertOrder(sender,sqltimestamp,9,1.85,'');
+                      insertOrder(sender,sqltimestamp,1,9,1.85,'');
                     }else{
-                      insertOrder(sender,sqltimestamp,10,2.05,'');
+                      insertOrder(sender,sqltimestamp,1,10,2.05,'');
                     }
                   }else if(e[i].type=='UnsizeableDrink'){
                     if(e[i].drink_type=='Shakes'){
-                      insertOrder(sender,sqltimestamp,11,2.15,'');
+                      insertOrder(sender,sqltimestamp,1,11,2.15,'');
                     }else if(e[i].drink_type=='Milk'){
-                      insertOrder(sender,sqltimestamp,12,0.99,'');
+                      insertOrder(sender,sqltimestamp,1,12,0.99,'');
                     }else if(e[i].drink_type=='Coffee'){
-                      insertOrder(sender,sqltimestamp,13,1.35,'');
+                      insertOrder(sender,sqltimestamp,1,13,1.35,'');
                     }
                   }
                 }
