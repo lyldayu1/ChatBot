@@ -217,9 +217,9 @@ app.post('/webhook', (req, res) => {
           wit.message(text).then(({entities}) => {
           // You can customize your response to these entities
             console.log(entities)
-	    console.log("entities to add text")
+	    /*console.log("entities to add text")
 	    entities["Text"] = text
-	    console.log(entities)
+	    console.log(entities)*/
 	    
             // For now, let's reply with another automatic message
             let reponseText=responseRobot.converse(entities)
