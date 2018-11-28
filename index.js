@@ -22,15 +22,26 @@ const findOrCreateSession = (fbid) => {
       sessionId = k;
     }
   });
-  if (!sessionId) {
+  if (!sessionId || flag === 0) {
     // No session found for user fbid, let's create a new one
-    responseRobot=require('./response/conversation')
-    flag=1
-    sessionId = new Date().toISOString();
-    sessions[sessionId] = {fbid: fbid, context: {}};
-    // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
-    console.log("sender: " + fbid)
+    if(!sessionId)
+    {
+      responseRobot=require('./response/conversation')
+      flag=1
+      sessionId = new Date().toISOString();
+      sessions[sessionId] = {fbid: fbid, context: {}};
+      // Send the first message to user
+      sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+      console.log("sender: " + fbid)   
+    }
+    if(sessionId && flag === 0)
+    {
+      flag=1
+      sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+      console.log("sender: " + fbid)   
+    }
+	  
+
   }
   return sessionId;
 };
