@@ -166,13 +166,13 @@ class Conversation {
         } else if (primary_stage == 3) {
             res = this._converse_ps3(recv)
         } else {
-            console.log("ERROR: Invalid primary stage number " + 
+            console.log("ERROR: In _converse(), invalid primary stage number " + 
                         + toString(primary_stage) + ".")
             this._bot_confused == true
         }
         if (res != 0) {
-            console.log("ERROR: At stage " + String(this.stage))
-            console.log("ERROR: Converse function returns non-zero.")
+            console.log("ERROR: In _converse(), at stage " + String(this.stage))
+            console.log("ERROR: converse_ps functions return non-zero.")
             this._bot_confused == true
         }
         if (this._bot_confused == true) {
@@ -190,12 +190,12 @@ class Conversation {
         } else if (primary_stage == 9) {
             return -1, randomArrayPicker(ORDER_FINISHED)
         } else {
-            console.log("ERROR: Invalid primary stage number.")
+            console.log("ERROR: In _converse(), invalid primary stage number.")
             return 1, text
         }
         if (res != 0) {
-            console.log("ERROR: At stage " + String(this.stage))
-            console.log("ERROR: Converse function returns non-zero.")
+            console.log("ERROR: In _converse(), at stage " + String(this.stage))
+            console.log("ERROR: response_ps functions return non-zero.")
             return 1, text
         }
         return 0, text
@@ -428,12 +428,12 @@ class Conversation {
             } else if (recv.conversationEnd[0].value == NO) {
                 return 0
             } else {
-                console.log("ERROR: _yn_parsing cannot parse value " + 
+                console.log("ERROR: In _yn_parsing(), cannot parse value " + 
                             recv.conversationEnd[0].value)
                 return -1
             }
         } else {
-            console.log("ERROR: in _yn_parsing, conversationEnd not in recv")
+            console.log("ERROR: In _yn_parsing, conversationEnd not in recv")
             return -1
         }
     }

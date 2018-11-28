@@ -55,7 +55,7 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 // Sets server port and logs message on success
-app.listen(process.env.PORT || 3000, () => console.log('webhook is listening'));
+app.listen(process.env.PORT || 3000, () => console.log('Webhook is listening'));
 
 
 // function connectSql(UID,Time,Content){
@@ -116,14 +116,14 @@ function connectSql(UID,Time,Content){
   if (err){
     console.log(err);
   }else{
-    console.log("Connected!")
+    console.log("In connectSql(): Connected!")
     var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+",'"+Content+"')";
     con.query(sql,function(err,result){
       con.release();
       if(err){
         throw err;
       }
-      console.log("record inserted");
+      console.log("In connectSql(): Record inserted");
     });
   }
 });
@@ -134,14 +134,14 @@ function insertOrder(UID,Time,Quantity,FoodType,Price,Options){
   if (err){
     console.log(err);
   }else{
-    console.log("Connected!")
+    console.log("in insertOrder(): Connected!")
     var sql="INSERT INTO Orders (UID,Time, Quantity,FoodType,Price,Options) VALUE ("+UID+","+Time+","+Quantity+","+FoodType+","+Price+",'"+Options+"')";
     con.query(sql,function(err,result){
       con.release();
       if(err){
         throw err;
       }
-      console.log("record inserted");
+      console.log("in insertOrder(): Record inserted");
     });
   }
 });
@@ -216,7 +216,6 @@ app.post('/webhook', (req, res) => {
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
-              console.log("DEBUG")
               if(responseRobot._order.whatIsNotFilled()==0){
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
@@ -252,12 +251,13 @@ app.post('/webhook', (req, res) => {
                   }
                 }
               }
-              console.log("renew robot")
+              console.log("In main: renew robot")
               responseRobot=responseRobot.renew()
             }
           })
           .catch((err) => {
-            console.error('Oops! Got an error from Wit: ', err.stack || err);
+            console.error('In main: Oops! Got an error from Wit: ',
+                          err.stack || err);
           })
         }
       }
@@ -298,9 +298,9 @@ function sendTextMessage(sender,text) {
 		}
 	}, function(error, response, body) {
 		if (error) {
-		    console.log('Error sending messages: ', error)
+		    console.log('In sendTextMessage(): Error sending messages: ', error)
 		} else if (response.body.error) {
-		    console.log('Error: ', response.body.error)
+		    console.log('In sendTextMessage(): Error: ', response.body.error)
 	    }
     })
 }
