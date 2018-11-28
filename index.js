@@ -221,9 +221,9 @@ app.post('/webhook', (req, res) => {
         // We could retrieve the user's current session, or create one if it doesn't exist
         // This is useful if we want our bot to figure out the conversation history
         const sessionId = findOrCreateSession(sender);
-        if(flag==1){
-          flag=0;
-        }else{
+        //if(flag==1){
+         // flag=0;
+        //}else{
 
           wit.message(text).then(({entities}) => {
           // You can customize your response to these entities
@@ -280,7 +280,7 @@ app.post('/webhook', (req, res) => {
             console.error('In main: Oops! Got an error from Wit: ',
                           err.stack || err);
           })
-        }
+        //}
       }
     }
     // body.entry.forEach(function(entry) {
