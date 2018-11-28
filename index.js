@@ -210,11 +210,11 @@ app.post('/webhook', (req, res) => {
       if (event.message && event.message.text) {
         let text = event.message.text;
         sqltext=text.substring(0, 200);
-        try{
-          connectSql(sender,sqltimestamp,sqltext);
-        }catch(e){
-          console.log(e);
-        }
+//         try{
+//           connectSql(sender,sqltimestamp,sqltext);
+//         }catch(e){
+//           console.log(e);
+//         }
         
         // We could retrieve the user's current session, or create one if it doesn't exist
         // This is useful if we want our bot to figure out the conversation history
