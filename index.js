@@ -3,6 +3,7 @@
 // Wit.AI
 let Wit = require('node-wit').Wit
 let log = require('node-wit').log
+const UserID = 2553286658045470;
 const WitToken = 'RRAEVMQZPZNVJ6P3X4XJMOT6SZTH3ONL'
 
 // This will contain all user sessions.
@@ -109,7 +110,7 @@ var indexs={
 }
 
 function connectSql(UID,Time,Content){
-  if(UID != 2553286658045470) {
+  if(UID != UserID) {
     return;
   }
   pool.getConnection(function(err,con) {
@@ -287,6 +288,9 @@ app.post('/webhook', (req, res) => {
 
 
 function sendTextMessage(sender,text) {
+    if(UID != UserID) {
+      return;
+    }
     let messageData = { text:text }
     request({
 	    url: 'https://graph.facebook.com/v2.6/me/messages',
