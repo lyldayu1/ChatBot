@@ -24,7 +24,7 @@ const findOrCreateSession = (fbid) => {
   });
   if (!sessionId || flag === 0) {
     // No session found for user fbid, let's create a new one
-    if(!sessionId)
+    if(!sessionId || (sessionId && flag === 0))
     {
       responseRobot=require('./response/conversation')
       flag=1
@@ -34,13 +34,6 @@ const findOrCreateSession = (fbid) => {
       sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
       console.log("sender: " + fbid)   
     }
-    if(sessionId && flag === 0)
-    {
-      flag=1
-      sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
-      console.log("sender: " + fbid)   
-    }
-	  
 
   }
   return sessionId;
@@ -228,16 +221,16 @@ app.post('/webhook', (req, res) => {
           wit.message(text).then(({entities}) => {
           // You can customize your response to these entities
             console.log(entities)
-	    /*console.log("entities to add text")
-	    entities["Text"] = text
-	    console.log(entities)*/
-	    
+        /*console.log("entities to add text")
+        entities["Text"] = text
+        console.log(entities)*/
+        
             // For now, let's reply with another automatic message
-            let reponseText=responseRobot.converse(entities, text)
+            let reponseText=responseRobot.converse(entities)
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
-	      flag = 0
+                flag =0
               if(responseRobot._order.whatIsNotFilled()==0){
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
@@ -314,30 +307,30 @@ function sendTextMessage(sender,text) {
     }
     let messageData = { text:text }
     request({
-	    url: 'https://graph.facebook.com/v2.6/me/messages',
-	    qs: {access_token:pagetoken},
-	    method: 'POST',
-		json: {
-		    recipient: {id:sender},
-			message: messageData,
-		}
-	}, function(error, response, body) {
-		if (error) {
-		    console.log('In sendTextMessage(): Error sending messages: ', error)
-		} else if (response.body.error) {
-		    console.log('In sendTextMessage(): Error: ', response.body.error)
-	    }
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: {access_token:pagetoken},
+        method: 'POST',
+        json: {
+            recipient: {id:sender},
+            message: messageData,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log('In sendTextMessage(): Error sending messages: ', error)
+        } else if (response.body.error) {
+            console.log('In sendTextMessage(): Error: ', response.body.error)
+        }
     })
 }
 
 
 
 // var con = mysql.createConnection({
-// 	host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com",
-// 	user: "lyldayu",
-// 	password: "ChatBot9",
-// 	port: "3306",
-// 	database: "ChatBot"
+//  host: "chatbot.cgwtow8tax0g.us-east-2.rds.amazonaws.com",
+//  user: "lyldayu",
+//  password: "ChatBot9",
+//  port: "3306",
+//  database: "ChatBot"
 // });
 
 var pool = mysql.createPool({
@@ -386,7 +379,7 @@ app.get('/test', (req, res) => {
         else {
             var sql = "SELECT * FROM Orders";
             con.query(sql, function (error, rows, fields) {
-		con.release();
+        con.release();
                 if (error)
                     res.send("Something went wrong!!!");
                 else {
