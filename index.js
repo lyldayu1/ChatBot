@@ -445,6 +445,9 @@ function queryInfo(key) {
           throw err;
         }
         console.log("in queryInfo(): Info queried");
+        console.log(result);
+        console.log(result[0]);
+        console.log(result[0]["Value"]);
         return result[0]["Value"];
       });
     }
