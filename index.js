@@ -243,58 +243,56 @@ app.post('/webhook', (req, res) => {
                 var openHour = '';
                 queryInfo("open hour", function(result) {
                   openHour = result;
+                  var closeHour = '';
+                  queryInfo("close hour", function(result) {
+                    closeHour = result;
+                    let now = new Date();
+                    let openDate = new Date(openHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
+                    let closeDate = new Date(closeHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
+                    if (now > closeDate && now < openDate) {
+                      sendTextMessage(sender, "Sorry, the restaurant is closed.");
+                    }
+                    else {
+                      sendTextMessage(sender, "Restaurant is opening!");
+                    }
+                  });
                 });
-                var closeHour = '';
-                queryInfo("close hour", function(result) {
-                  closeHour = result;
-                });
-                let now = new Date();
-                let openDate = new Date(openHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
-                let closeDate = new Date(closeHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
-                if (now > closeDate && now < openDate) {
-                  sendTextMessage(sender, "Sorry, the restaurant is closed.");
-                }
-                else {
-                  sendTextMessage(sender, "Restaurant is opening!");
-                }
               }
               else if (value == "speciality") {
-                var recommendations;
                 queryRecommendation(function(result) {
-                  recommendations = result;
-                });
-                var message = "Today's speciality(s): \n";
-                for (i = 0; i < recommendations.length; i++) {
-                  message += indexs[recommendations[i]['FoodType']];
-                  if (i != recommendations.length - 1) {
-                    message += '\n';
+                  var recommendations = result;
+                  var message = "Today's speciality(s): \n";
+                  for (i = 0; i < recommendations.length; i++) {
+                    message += indexs[recommendations[i]['FoodType']];
+                    if (i != recommendations.length - 1) {
+                      message += '\n';
+                    }
                   }
-                }
-                sendTextMessage(sender, message);
+                  sendTextMessage(sender, message);
+                });
               }
               else if (value == "info") {
                 var location = 'Location: ';
                 queryInfo("location", function(result) {
                   location += result;
-                });
-                var contactNumber = 'Contact number: ';
-                queryInfo("contact number", function(result) {
-                  contactNumber += result;
-                });
-                var businessHour = 'Business hour: ';
-                queryInfo("business hour", function(result) {
-                  businessHour += result;
-                });
-                var info = location + '\n' + contactNumber + '\n' + businessHour;
-                sendTextMessage(sender, info);
+                  var contactNumber = 'Contact number: ';
+                  queryInfo("contact number", function(result) {
+                    contactNumber += result;
+                    var businessHour = 'Business hour: ';
+                    queryInfo("business hour", function(result) {
+                      businessHour += result;
+                      var info = location + '\n' + contactNumber + '\n' + businessHour;
+                      sendTextMessage(sender, info);
+                    });
+                  });
+                }); 
               }
               else {
-                var info = '';
                 queryInfo(value, function(result) {
-                  info += result;
-                });
-                console.log(info);
-                sendTextMessage(sender, info);
+                  let info = result;
+                  console.log(info);
+                  sendTextMessage(sender, info);
+                }); 
               }
               return;
             }
