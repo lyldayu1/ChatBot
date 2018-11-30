@@ -145,7 +145,6 @@ function insertOrder(UID,Time,Quantity,FoodType,Price,Options){
     console.log(err);
   }else{
     console.log("in insertOrder(): Connected!")
-    console.log("UID = " + UID + ", Time = " + Time + ", Quantity = " + Quantity + ", FoodType = " + FoodType + ", Price = " + Price + ", Options = " + Options);
     var sql="INSERT INTO Orders (UID,Time, Quantity,FoodType,Price,Options) VALUE ("+UID+","+Time+","+Quantity+","+FoodType+","+Price+",'"+Options+"')";
     con.query(sql,function(err,result){
       con.release();
@@ -233,13 +232,49 @@ app.post('/webhook', (req, res) => {
         
             // For now, let's reply with another automatic message
             if(entities.info_request!=null){
-              if(entities.info_request[0].value=="menu"){
-                console.log("get menu");
+              var value = entities.info_request[0].value
+              console.log("get " + value);
+              if(value=="menu"){
                 let file="./Menu.png";
                 //sendMenu(sender,file);
                 sendImageMessage(sender,file);
-                return;
               }
+              else if (value == "opening") {
+                let openHour = queryInfo("open hour");
+                let closeHour = queryInfo("close hour");
+                let now = new Date();
+                let openDate = new Date(openHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
+                let closeDate = new Date(closeHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
+                if (now > closeDate && now < openDate) {
+                  sendTextMessage(sender, "Restaurant is closed");
+                }
+                else {
+                  sendTextMessage(sender, "Restaurant is opening");
+                }
+              }
+              else if (value == "speciality") {
+                let recommendations = queryRecommendation();
+                let message = "Today's speciality(s): \n";
+                for (i = 0; i < recommendations.length; i++) {
+                  message += indexs[recommendations[i]['FoodType']];
+                  if (i != recommendations.length - 1) {
+                    message += '\n';
+                  }
+                }
+                sendTextMessage(sender, message);
+              }
+              else if (value == "info") {
+                let location = 'Location: ' + queryInfo("location");
+                let contactNumber = 'Contact number: ' + queryInfo("contact number");
+                let businessHour = 'Business hour: ' + queryInfo("business hour");
+                let info = location + '\n' + contactNumber + '\n' + businessHour;
+                sendTextMessage(sender, info);
+              }
+              else {
+                let info = queryInfo(value);
+                sendTextMessage(sender, info);
+              }
+              return;
             }
             let reponseTuple = responseRobot.converse(entities, text)
             let reponseText = reponseTuple.text
@@ -397,6 +432,29 @@ function callSendAPI(messageData) {
     form.append('filedata', messageData.filedata); //no need to stringify!
 }
 
+function queryInfo(key) {
+  var sql="SELECT Value FROM Info WHERE Key = " + key;
+  con.query(sql,function(err,result, fields) {
+    con.release();
+    if(err){
+      throw err;
+    }
+    console.log("in queryInfo(): Info queried");
+    return result[0]["Value"];
+  });
+}
+
+function queryRecommendation() {
+  var sql="SELECT * FROM Recommendations";
+  con.query(sql,function(err,result, fields) {
+    con.release();
+    if(err){
+      throw err;
+    }
+    console.log("in queryRecommendation(): Recommendations queried");
+    return result;
+  });
+}
 
 
 // var con = mysql.createConnection({
