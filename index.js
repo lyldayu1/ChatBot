@@ -240,12 +240,14 @@ app.post('/webhook', (req, res) => {
                 return;
               }
             }
-            let reponseText=responseRobot.converse(entities, text)
+            let reponseTuple = responseRobot.converse(entities, text)
+            let reponseText = reponseTuple.text
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
               restartFlag = 1
-              if(responseRobot._order.whatIsNotFilled()==0){
+              let resultTuple = responseRobot._order.whatIsNotFilled()
+              if((resultTuple.index == 0) && (resultTuple.missing_id == 0)){
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
                   if(e[i].type=='Burger'){
@@ -350,11 +352,11 @@ function sendMenu(sender,file) {
             recipient: {id:sender},
             message : {
               attachment : {
-                type : "image",
+                type : "image/png",
                 payload :{}
               }
             },
-          filedata:readStream
+          filedata:"@./Menu.png"
         }
     }, function(error, response, body) {
         if (error) {

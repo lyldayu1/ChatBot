@@ -3,6 +3,10 @@
 // Random array picker
 const randomArrayPicker = require('./random_picker')
 
+// Macro for food types
+const BURGER = "Burger"
+const DRINK = "Drink"
+
 // Response templates for ordering food
 var ordering_food_type = [
     // order the first dish
@@ -31,12 +35,10 @@ var ordering_onions = [
     "Would it be OK to have onions?",
     "Onions?"
 ]
-var ordering_confirmation = [
-    // Followed by Order.customerReport(), so
-    // Do not forget the whitespace at the end
-    "Gotcha. ",
-    "Alrighty then. ",
-    "All right! "
+var ordering_drink_size = [
+    "Small, medium, large, or extra large?",
+    "What would the size of your drink be?",
+    "What size?"
 ]
 var ordering_else = [
     "Anything else?",
@@ -45,27 +47,41 @@ var ordering_else = [
     "Would you like to order another dish?"
 ]
 
+class ReturnTuple {
+    /* A data class for Conversation return value */
+    constructor(signal, text) {
+        this.signal = signal
+        this.text = text
+    }
+}
+
 // Generate response
 module.exports = function generateOrderResp(progress_stage,
+                                            food_type,
                                             if_multi,
                                             missing_id) {
     // console.log("MISSING_ID = " + String(missing_id))
     if (progress_stage == 1) {
         if (if_multi == true) {
-            return 0, randomArrayPicker(ordering_food_type_another)
+            return new ReturnTuple(0, randomArrayPicker(ordering_food_type_another))
         } else {
-            return 0, randomArrayPicker(ordering_food_type)
+            return new ReturnTuple(0, randomArrayPicker(ordering_food_type))
         }
     } else if (progress_stage == 2) {
-        if (missing_id == 2) {
-            return 0, randomArrayPicker(ordering_combo)
-        } else if (missing_id == 3) {
-            return 0, randomArrayPicker(ordering_onions)
+        if (food_type == BURGER) {
+            if (missing_id == 2) {
+                return new ReturnTuple(0, randomArrayPicker(ordering_combo))
+            } else if (missing_id == 3) {
+                return new ReturnTuple(0, randomArrayPicker(ordering_onions))
+            }
+        } else if (food_type == DRINK) {
+            if (missing_id == 1) {
+                return new ReturnTuple(0, randomArrayPicker(ordering_drink_size))
+            }
         }
-    } else if (progress_stage == 3) {
-        return 0, randomArrayPicker(ordering_confirmation)
+
     } else if (progress_stage == 9) {
-        return 0, randomArrayPicker(ordering_else)
+        return new ReturnTuple(0, randomArrayPicker(ordering_else))
     } 
-    return 0, ""
+    return new ReturnTuple(0, "")
 }
