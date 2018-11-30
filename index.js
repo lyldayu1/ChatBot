@@ -272,6 +272,7 @@ app.post('/webhook', (req, res) => {
               }
               else {
                 let info = queryInfo(value);
+                console.log(info);
                 sendTextMessage(sender, info);
               }
               return;
