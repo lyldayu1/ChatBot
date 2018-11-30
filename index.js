@@ -263,7 +263,7 @@ app.post('/webhook', (req, res) => {
                   var recommendations = result;
                   var message = "Today's speciality(s): \n";
                   for (i = 0; i < recommendations.length; i++) {
-                    message += indexs[recommendations[i]['FoodType']];
+                    message += recommendations[i]['Name'];
                     if (i != recommendations.length - 1) {
                       message += '\n';
                     }
@@ -477,7 +477,7 @@ function queryRecommendation(callback) {
       console.log(err);
     }else{
       console.log("in queryRecommendation(): Connected!")
-      var sql="SELECT * FROM Recommendations";
+      var sql="SELECT Name FROM Menu, Recommendations WHERE Menu.FoodType = Recommendations.FoodType";
       con.query(sql,function(err,result, fields) {
         con.release();
         if(err){
