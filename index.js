@@ -296,6 +296,21 @@ app.post('/webhook', (req, res) => {
               }
               return;
             }
+            else if (entities.give_recommendation!=null){
+              queryRecommendation(function(result) {
+                var recommendations = result;
+                var message = "Today's speciality(s): \n";
+                for (i = 0; i < recommendations.length; i++) {
+                  message += recommendations[i]['Name'];
+                  if (i != recommendations.length - 1) {
+                    message += '\n';
+                  }
+                }
+                sendTextMessage(sender, message);
+              });
+              return;
+            }
+
             let reponseTuple = responseRobot.converse(entities, text)
             let reponseText = reponseTuple.text
             console.log(responseRobot.stage)
