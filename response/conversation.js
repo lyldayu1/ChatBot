@@ -87,6 +87,15 @@ const BOT_CONFUSED = [
 ]
 
 
+class ReturnTuple {
+    /* A data class for Conversation return value */
+    constructor(signal, text) {
+        this.signal = signal
+        this.text = text
+    }
+}
+
+
 class Conversation {
     /** Handles the interaction between messages and index.js
      *  @param {integer} this.stage:
@@ -150,7 +159,7 @@ class Conversation {
          *      Will return status code -1 if this.stage == 999.
          */
         if (this.stage == 999) {
-            return (-1, "")
+            return new ReturnTuple(-1, "")
         } else {
             return this._converse(entities, text)
         }
@@ -193,28 +202,35 @@ class Conversation {
         }
         if (this._bot_confused == true) {
             this._bot_confused = false
-            return 1, randomArrayPicker(BOT_CONFUSED)
+            return new ReturnTuple(1, randomArrayPicker(BOT_CONFUSED))
         }
         primary_stage = Math.floor(this.stage / 100)
+        var signal = 0
         var text = ""
         if (primary_stage == 1) {
-            res, text = this._response_ps1(recv)
+            var tuple = this._response_ps1(recv)
+            signal = tuple.signal
+            text = tuple.text
         } else if (primary_stage == 2) {
-            res, text = this._response_ps2(recv)
+            var tuple = this._response_ps2(recv)
+            signal = tuple.signal
+            text = tuple.text
         } else if (primary_stage == 3) {
-            res, text = this._response_ps3(recv)
+            var tuple = this._response_ps3(recv)
+            signal = tuple.signal
+            text = tuple.text
         } else if (primary_stage == 9) {
-            return -1, randomArrayPicker(ORDER_FINISHED)
+            return new ReturnTuple(-1, randomArrayPicker(ORDER_FINISHED))
         } else {
             console.log("ERROR: In _converse(), invalid primary stage number.")
-            return 1, text
+            return new ReturnTuple(1, text)
         }
-        if (res != 0) {
+        if (signal != 0) {
             console.log("ERROR: In _converse(), at stage " + String(this.stage))
             console.log("ERROR: response_ps functions return non-zero.")
-            return 1, text
+            return new ReturnTuple(1, text)
         }
-        return 0, text
+        return new ReturnTuple(0, text)
     }
 
     _converse_ps1(recv) {
@@ -229,14 +245,15 @@ class Conversation {
                 this.stage = 201
                 return 0
             }
-            res = this._order.whatIsNotFilled()
-            if (res != (this._dishno, 0)) {
+            var tuple = this._order.whatIsNotFilled()
+            var index = tuple.index
+            var missing_id = tuple.missing_id
+            if ((index == this._dishno) && (missing_id != 0)) {
                 this.stage = 202
-                return 0
             } else {
                 this.stage = 209
-                return 0
             }
+            return 0
         } else if (RESERVE in recv) {
             // Make reservation (211 - 213, 219)
             // 212 = Require additional info
@@ -337,8 +354,10 @@ class Conversation {
             this._bot_confused = true
             return 0
         }
-        res = this._order.whatIsNotFilled()
-        if (res != (this._dishno, 0)) {
+        var tuple = this._order.whatIsNotFilled()
+        var index = tuple.index
+        var missing_id = tuple.missing_id
+        if ((index == this._dishno) && (missing_id != 0)) {
             this.stage = 202
         } else {
             this.stage = 209
@@ -348,9 +367,13 @@ class Conversation {
 
     _converse_s202(recv) {
         this._order.fill(this._dishno, recv)
-        var res = this._order.whatIsNotFilled()
-        if (res == (this._dishno, 0)) {
-            this.stage = 209
+        var tuple = this._order.whatIsNotFilled()
+        var index = tuple.index
+        var missing_id = tuple.missing_id
+        if (index == 0) {
+            if (missing_id == 0) {
+                this.stage = 209
+            }
         }
         return 0
     }
@@ -358,12 +381,15 @@ class Conversation {
     _converse_s209(recv) {
         var yn = this._yn_parsing(recv)
         if (yn == 0) {
+            // Only when explicitly declaring NO
+            // will the stage advance to 301
             this.stage = 301
         } else if (yn == 1) {
             // Explicit ordering
             // Attempt to look for food_type in recv
             // if not possible, change stage to 201
             // if possible, change stage to 202 or 209
+            var res = 0
             this._multiple_dish_flag = true
             this._dishno = this._dishno + 1
             this.stage = 201
@@ -371,11 +397,15 @@ class Conversation {
             if (res == 1) {
                 return 0
             }
-            res = this._order.whatIsNotFilled()
-            if (res != (this._dishno, 0)) {
+            var tuple = this._order.whatIsNotFilled()
+            var index = tuple.index
+            var missing_id = tuple.missing_id
+            if ((index == this._dishno) && (missing_id != 0)) {
                 this.stage = 202
+                return 0
             } else {
                 this.stage = 209
+                return 0
             }
         } else {
             // Inexplicit ordering:
@@ -392,11 +422,15 @@ class Conversation {
             }
             this._multiple_dish_flag = true
             this._dishno = this._dishno + 1
-            res = this._order.whatIsNotFilled()
-            if (res != (this._dishno, 0)) {
+            var tuple = this._order.whatIsNotFilled()
+            var index = tuple.index
+            var missing_id = tuple.missing_id
+            if ((index == this._dishno) && (missing_id != 0)) {
                 this.stage = 202
+                return 0
             } else {
                 this.stage = 209
+                return 0
             }
         }
         return 0
@@ -429,7 +463,7 @@ class Conversation {
     }
 
     _response_ps1() {
-        return 0
+        return new ReturnTuple(0, "")
     }
 
     _response_ps2(recv) {
@@ -438,19 +472,25 @@ class Conversation {
         if (secondary_stage == 0) {
             var res = 0, text = null
             if (progress_stage != 1) {
-                res, text =  _order_resp_module(
+                var tuple = _order_resp_module(
                     progress_stage,
+                    this._order.dishlist[this._dishno].type,
                     this._multiple_dish_flag,
                     this._order.dishlist[this._dishno].whatIsNotFilled()
                 )
+                res = tuple.signal
+                text = tuple.text
             } else {
-                res, text =  _order_resp_module(
+                var tuple =  _order_resp_module(
                     progress_stage,
+                    1,
                     this._multiple_dish_flag,
                     1
                 )
+                res = tuple.signal
+                text = tuple.text
             }
-            return res, text
+            return new ReturnTuple(res, text)
         } else if (secondary_stage == 1) {
             return _reservation_resp_module(
                 this._reservation.whatIsNotFilled()
@@ -469,11 +509,12 @@ class Conversation {
     _response_ps3(recv) {
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
-            return 0, randomArrayPicker(ORDER_CONFIRM) +
-                      this._order.customerReport() + 
-                      randomArrayPicker(APPEND_CONFIRM)
+            return new ReturnTuple(0,
+                                   randomArrayPicker(ORDER_CONFIRM) +
+                                   this._order.customerReport() + 
+                                   randomArrayPicker(APPEND_CONFIRM))
         } else if (progress_stage == 2) {
-            return 0, randomArrayPicker(SPECIAL_INST)
+            return new ReturnTuple(0, randomArrayPicker(SPECIAL_INST))
         }
     }
 
@@ -534,6 +575,4 @@ class Conversation {
     }
 }
 
-
 module.exports = new Conversation()
-

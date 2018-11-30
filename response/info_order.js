@@ -39,8 +39,18 @@ const DRINK_SIZE = ["small",
                     "medium",
                     "large",
                     "extra large"]
+const YN_LIST = "conversationEnd"
+const SIZE_LIST = "size_type"
 const YES = "yes"
 const NO = "no"
+
+class OrderFillTuple {
+    /* A data class for Order.whatIsNotFilled() */
+    constructor(index, missing_id) {
+        this.index = index
+        this.missing_id = missing_id
+    }
+}
 
 module.exports = class Order {
     /** Consists of an order.
@@ -94,16 +104,16 @@ module.exports = class Order {
     whatIsNotFilled() {
         if (this.dishlist.length == 0) {
             console.log("Order No. " + this.order_no.toString() + " is empty.")
-            return (0, 0)
+            return new OrderFillTuple(0, 0)
         } else {
             var res = 0
             for (var i = 0; i < this.dishlist.length; i ++) {
                 res = this.dishlist[i].whatIsNotFilled()
                 if (res != 0) {
-                    return (i, res)
+                    return new OrderFillTuple(i, res)
                 }
             }
-            return (0, 0)
+            return new OrderFillTuple(0, 0)
         }
     }
 
@@ -116,16 +126,16 @@ module.exports = class Order {
             var temp_food = food_type[0].value
             if ((BURGER.includes(temp_food)) || (BURGER_COMBO.includes(temp_food))) {
                 // TODO: Redesign combo compatibility, support other food types
+                var combo = null
+                if (BURGER_COMBO.includes(temp_food)){
+                    combo = 1
+                }
                 if (!("burger_type" in recv)) {
-                    this.dishlist.push(new Burger(temp_food)) 
+                    this.dishlist.push(new Burger(temp_food, combo)) 
                     return 0
                 }
                 var burger_type = recv.burger_type
                 var onion = null, lettuce = 1, tomato = 1
-                var combo = null
-                if (BURGER_COMBO.includes(temp_food)){
-                    var combo = 1
-                }
                 for (var i = 0; i < burger_type.length; i ++) {
                     if (ONION.includes(burger_type[i].value)) {
                         onion = ONION.indexOf(burger_type[i].value)
@@ -145,7 +155,11 @@ module.exports = class Order {
             } else if (temp_food == DRINK) {
                 var drink_size = null
                 if ("size_type" in recv) {
-                    drink_size = DRINK_SIZE.indexOf(recv.size_type[0].value)
+                    for (var i = 0; i < recv.size_type.length; i ++) {
+                        if (DRINK_SIZE.includes(recv.size_type[i].value)){
+                            drink_size = DRINK_SIZE.indexOf(recv.size_type[i].value)
+                        }
+                    }
                 }
                 this.dishlist.push(new Drink(drink_size))
                 return 0
@@ -166,17 +180,18 @@ module.exports = class Order {
         var food = this.dishlist[index]
         var food_type = food.food_type
         if ((BURGER.includes(food_type)) || (BURGER_COMBO.includes(food_type))) {
-            if (("conversationEnd" in recv) && (Object.keys(recv).length == 1)) {
-                var _, attr_index = this.whatIsNotFilled()
-                if (recv.conversationEnd[0].value == YES) {
+            if (Object.keys(recv).length == 1) {
+                var tuple = this.whatIsNotFilled()
+                var attr_index = tuple.missing_id
+                var res = this._yn_parsing(recv)
+                if (res == 1) {
                     food.indexFill(attr_index, 1)
-                } else if (recv.conversationEnd[0].value == NO) {
+                    return 0
+                } else if (res == 0) {
                     food.indexFill(attr_index, 0)
-                } else {
-                    throw "fill cannot parse conversationEnd of value " + 
-                          recv.conversationEnd[0].value
+                    return 0
                 }
-                return 0
+                // else, ignore this check and proceed to the next checks
             }
             if ("food_type" in recv) {
                 var recv_food_type = recv.food_type
@@ -208,9 +223,13 @@ module.exports = class Order {
         } else if (food_type == DRINK) {
             var drink_size = null
             if ("size_type" in recv) {
-                drink_size = DRINK_SIZE.indexOf(recv.size_type[0].value)
+                for (var i = 0; i < recv.size_type.length; i ++) {
+                    if (DRINK_SIZE.includes(recv.size_type[i].value)){
+                        drink_size = DRINK_SIZE.indexOf(recv.size_type[i].value)
+                    }
+                }
             }
-            food.drink_size = drink_size
+            food.size = drink_size
             return 0
         } else if (UNSIZEABLE_DRINK.includes(food_type)) {
             // nothing to do here since type is predetermined in addFill()
@@ -278,6 +297,58 @@ module.exports = class Order {
                          "food_type not in BURGER_COMBO.")
              return 1
          }
+    }
+
+    _yn_parsing(recv) {
+        // Case 1: yn in size_type
+        if (SIZE_LIST in recv) {
+            if (recv.size_type[0].value == YES) {
+                return 1
+            } else if (recv.size_type[0].value == NO) {
+                return 0
+            } else {
+                // Case 2: yn in size_type/conversationEnd
+                if (YN_LIST in recv.size_type[0]) {
+                    if (recv.size_type[0].conversationEnd[0].value == YES) {
+                        return 1
+                    } else if (recv.size_type[0].conversationEnd[0].value == NO) {
+                        return 0
+                    } else {
+                        console.log("ERROR: In _yn_parsing() case 2")
+                        return -1
+                    }
+                } else {
+                    console.log("ERROR: In _yn_parsing() case 1")
+                    return -1
+                }
+            }
+        }
+        // Case 3: yn in conversationEnd
+        if (YN_LIST in recv) {
+            if (recv.conversationEnd[0].value == YES) {
+                return 1
+            } else if (recv.conversationEnd[0].value == NO) {
+                return 0
+            } else {
+                // Case 4: yn in conversationEnd/size_type
+                if (SIZE_LIST in recv.conversationEnd[0]) {
+                    if (recv.conversationEnd[0].size_type[0].value == YES) {
+                        return 1
+                    } else if (recv.conversationEnd[0].size_type[0].value == NO) {
+                        return 0
+                    } else {
+                        console.log("ERROR: In _yn_parsing() case 4")
+                         return -1
+                    }
+                } else {
+                    console.log("ERROR: In _yn_parsing() case 3")
+                    return -1
+                }
+            }
+        }
+        // This happens, but I consider this as a bad practise
+        // return -1 if conversationEnd or size_type not in recv
+        return -1
     }
 }
 
@@ -376,6 +447,7 @@ class Fries {
 
     constructor() {
         this.type = "Fries"
+        this.food_type = FRIES
     }
 
     print() {
@@ -401,6 +473,7 @@ class Drink {
 
     constructor(size=null) {
         this.type = "Drink"
+        this.food_type = DRINK
         this.size = size
     }
 
@@ -416,6 +489,13 @@ class Drink {
             3: "extra large"
         }
         return size_correspond[this.size] + " fountain drink."
+    }
+
+    indexFill(attr_index, value) {
+        if (attr_index == 1) {
+            this.size = value
+        }
+        return
     }
 
     whatIsNotFilled() {
@@ -441,6 +521,7 @@ class UnsizeableDrink {
         }
         this.type = "UnsizeableDrink"
         this.drink_type = type
+        this.food_type = type
     }
 
     print() {

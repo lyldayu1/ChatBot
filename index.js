@@ -231,12 +231,14 @@ app.post('/webhook', (req, res) => {
         console.log(entities)*/
         
             // For now, let's reply with another automatic message
-            let reponseText=responseRobot.converse(entities, text)
+            let reponseTuple = responseRobot.converse(entities, text)
+            let reponseText = reponseTuple.text
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
             if(responseRobot.stage == 999){
               restartFlag = 1
-              if(responseRobot._order.whatIsNotFilled()==0){
+              let resultTuple = responseRobot._order.whatIsNotFilled()
+              if((resultTuple.index == 0) && (resultTuple.missing_id == 0)){
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
                   if(e[i].type=='Burger'){
