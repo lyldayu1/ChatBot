@@ -236,7 +236,8 @@ app.post('/webhook', (req, res) => {
               if(entities.info_request[0].value=="menu"){
                 console.log("get menu");
                 let file="./Menu.png";
-                sendMenu(sender,file);
+                //sendMenu(sender,file);
+                sendImageMessage(sender,file);
                 return;
               }
             }
@@ -365,6 +366,35 @@ function sendMenu(sender,file) {
             console.log('In sendTextMessage(): Error: ', response.body.error)
         }
     })
+}
+function sendImageMessage(sender, file_loc){
+    let fs = require('fs');
+    var readStream = fs.createReadStream(file_loc);
+    var messageData = {
+        recipient : {
+            id : sender
+        },
+        message : {
+            attachment : {
+                type : "image",
+                payload :{}
+            }
+        },
+        filedata:readStream
+    }
+    callSendAPI(messageData);
+}
+
+function callSendAPI(messageData) {
+    var endpoint = "https://graph.facebook.com/v2.6/me/messages?access_token=" + pagetoken;
+    var r = request.post(endpoint, function(err, httpResponse, body) {
+        if (err) {return console.error("upload failed >> \n", err)};
+        console.log("upload successfull >> \n", body); //facebook always return 'ok' message, so you need to read error in 'body.error' if any
+    });
+    var form = r.form();
+    form.append('recipient', JSON.stringify(messageData.recipient));
+    form.append('message', JSON.stringify(messageData.message));
+    form.append('filedata', messageData.filedata); //no need to stringify!
 }
 
 
