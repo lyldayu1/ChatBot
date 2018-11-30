@@ -240,8 +240,14 @@ app.post('/webhook', (req, res) => {
                 sendImageMessage(sender,file);
               }
               else if (value == "opening") {
-                let openHour = queryInfo("open hour");
-                let closeHour = queryInfo("close hour");
+                var openHour;
+                queryInfo("open hour", function(result) {
+                  openHour = result;
+                });
+                let closeHour;
+                queryInfo("close hour", function(result) {
+                  closeHour = result;
+                });
                 let now = new Date();
                 let openDate = new Date(openHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
                 let closeDate = new Date(closeHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
@@ -264,14 +270,26 @@ app.post('/webhook', (req, res) => {
                 sendTextMessage(sender, message);
               }
               else if (value == "info") {
-                let location = 'Location: ' + queryInfo("location");
-                let contactNumber = 'Contact number: ' + queryInfo("contact number");
-                let businessHour = 'Business hour: ' + queryInfo("business hour");
+                let location = 'Location: ';
+                queryInfo("location", function(result) {
+                  location += result;
+                });
+                let contactNumber = 'Contact number: ';
+                queryInfo("contact number", function(result) {
+                  contactNumber += result;
+                });
+                let businessHour = 'Business hour: ';
+                queryInfo("business hour", function(result) {
+                  businessHour += result;
+                });
                 let info = location + '\n' + contactNumber + '\n' + businessHour;
                 sendTextMessage(sender, info);
               }
               else {
-                let info = queryInfo(value);
+                let info;
+                queryInfo(value, function(result) {
+                  info += result;
+                });
                 console.log(info);
                 sendTextMessage(sender, info);
               }
@@ -433,9 +451,8 @@ function callSendAPI(messageData) {
     form.append('filedata', messageData.filedata); //no need to stringify!
 }
 
-async function queryInfo(key) {
-  var answer = "";
-  await pool.getConnection(function(err,con) {
+function queryInfo(key, callback) {
+  pool.getConnection(function(err,con) {
     if (err){
       console.log(err);
     }else{
@@ -447,11 +464,10 @@ async function queryInfo(key) {
           throw err;
         }
         console.log("in queryInfo(): Info queried");
-        answer = result[0]["Value"];
+        return callback(result[0]["Value"])
       });
     }
   });
-  return answer;
 }
 
 async function queryRecommendation() {
