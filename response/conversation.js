@@ -189,6 +189,7 @@ class Conversation {
         } else if (primary_stage == 2) {
             res = this._converse_ps2(recv)
         } else if (primary_stage == 3) {
+            console.log(recv)
             res = this._converse_ps3(recv)
         } else {
             console.log("ERROR: In _converse(), invalid primary stage number " + 
@@ -216,6 +217,7 @@ class Conversation {
             signal = tuple.signal
             text = tuple.text
         } else if (primary_stage == 3) {
+            console.log(recv)
             var tuple = this._response_ps3(recv)
             signal = tuple.signal
             text = tuple.text
