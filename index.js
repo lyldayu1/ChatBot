@@ -246,10 +246,10 @@ app.post('/webhook', (req, res) => {
                 let openDate = new Date(openHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
                 let closeDate = new Date(closeHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
                 if (now > closeDate && now < openDate) {
-                  sendTextMessage(sender, "Restaurant is closed");
+                  sendTextMessage(sender, "Sorry, the restaurant is closed.");
                 }
                 else {
-                  sendTextMessage(sender, "Restaurant is opening");
+                  sendTextMessage(sender, "Restaurant is opening!");
                 }
               }
               else if (value == "speciality") {
@@ -438,7 +438,7 @@ function queryInfo(key) {
       console.log(err);
     }else{
       console.log("in queryInfo(): Connected!")
-      var sql="SELECT Value FROM Info WHERE Key = " + key;
+      var sql="SELECT Value FROM Info WHERE Item = '" + key + "'";
       con.query(sql,function(err,result, fields) {
         con.release();
         if(err){
