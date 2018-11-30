@@ -126,6 +126,7 @@ function connectSql(UID,Time,Content){
     console.log(err);
   }else{
     console.log("In connectSql(): Connected!")
+    console.log("INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+",'"+Content+"')");
     var sql="INSERT INTO Conversations (UID,Time, Content) VALUE ("+UID+","+Time+",'"+Content+"')";
     con.query(sql,function(err,result){
       con.release();
@@ -209,11 +210,11 @@ app.post('/webhook', (req, res) => {
       if (event.message && event.message.text) {
         let text = event.message.text;
         sqltext=text.substring(0, 200);
-        try{
-          connectSql(sender,sqltimestamp,sqltext);
-        }catch(e){
-          console.log(e);
-        }
+//         try{
+//           connectSql(sender,sqltimestamp,sqltext);
+//         }catch(e){
+//           console.log(e);
+//         }
         
         // We could retrieve the user's current session, or create one if it doesn't exist
         // This is useful if we want our bot to figure out the conversation history
@@ -231,6 +232,14 @@ app.post('/webhook', (req, res) => {
         console.log(entities)*/
         
             // For now, let's reply with another automatic message
+            if(entities.info_request!=null){
+              if(entities.info_request[0].value=="menu"){
+                console.log("get menu");
+                let file="./Menu.png";
+                sendMenu(sender,file);
+                return;
+              }
+            }
             let reponseTuple = responseRobot.converse(entities, text)
             let reponseText = reponseTuple.text
             console.log(responseRobot.stage)
@@ -320,6 +329,34 @@ function sendTextMessage(sender,text) {
         json: {
             recipient: {id:sender},
             message: messageData,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log('In sendTextMessage(): Error sending messages: ', error)
+        } else if (response.body.error) {
+            console.log('In sendTextMessage(): Error: ', response.body.error)
+        }
+    })
+}
+function sendMenu(sender,file) {
+    if(sender != UserID) {
+      return;
+    }
+    let fs = require('fs');
+    var readStream = fs.createReadStream(file);
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: {access_token:pagetoken},
+        method: 'POST',
+        json: {
+            recipient: {id:sender},
+            message : {
+              attachment : {
+                type : "image/png",
+                payload :{}
+              }
+            },
+          filedata:"@./Menu.png"
         }
     }, function(error, response, body) {
         if (error) {
