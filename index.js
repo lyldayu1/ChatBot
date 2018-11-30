@@ -240,11 +240,11 @@ app.post('/webhook', (req, res) => {
                 sendImageMessage(sender,file);
               }
               else if (value == "opening") {
-                var openHour;
+                var openHour = '';
                 queryInfo("open hour", function(result) {
                   openHour = result;
                 });
-                let closeHour;
+                var closeHour = '';
                 queryInfo("close hour", function(result) {
                   closeHour = result;
                 });
@@ -259,8 +259,11 @@ app.post('/webhook', (req, res) => {
                 }
               }
               else if (value == "speciality") {
-                let recommendations = queryRecommendation();
-                let message = "Today's speciality(s): \n";
+                var recommendations;
+                queryRecommendation(function(result) {
+                  recommendations = result;
+                });
+                var message = "Today's speciality(s): \n";
                 for (i = 0; i < recommendations.length; i++) {
                   message += indexs[recommendations[i]['FoodType']];
                   if (i != recommendations.length - 1) {
@@ -270,23 +273,23 @@ app.post('/webhook', (req, res) => {
                 sendTextMessage(sender, message);
               }
               else if (value == "info") {
-                let location = 'Location: ';
+                var location = 'Location: ';
                 queryInfo("location", function(result) {
                   location += result;
                 });
-                let contactNumber = 'Contact number: ';
+                var contactNumber = 'Contact number: ';
                 queryInfo("contact number", function(result) {
                   contactNumber += result;
                 });
-                let businessHour = 'Business hour: ';
+                var businessHour = 'Business hour: ';
                 queryInfo("business hour", function(result) {
                   businessHour += result;
                 });
-                let info = location + '\n' + contactNumber + '\n' + businessHour;
+                var info = location + '\n' + contactNumber + '\n' + businessHour;
                 sendTextMessage(sender, info);
               }
               else {
-                let info;
+                var info = '';
                 queryInfo(value, function(result) {
                   info += result;
                 });
@@ -470,7 +473,7 @@ function queryInfo(key, callback) {
   });
 }
 
-async function queryRecommendation() {
+function queryRecommendation(callback) {
   pool.getConnection(function(err,con) {
     if (err){
       console.log(err);
@@ -483,7 +486,7 @@ async function queryRecommendation() {
           throw err;
         }
         console.log("in queryRecommendation(): Recommendations queried");
-        return result;
+        return callback(result);
       });
     }
   });
