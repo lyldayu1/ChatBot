@@ -240,8 +240,8 @@ app.post('/webhook', (req, res) => {
                 sendImageMessage(sender,file);
               }
               else if (value == "opening") {
-                let openHour = await queryInfo("open hour");
-                let closeHour = await queryInfo("close hour");
+                let openHour = queryInfo("open hour");
+                let closeHour = queryInfo("close hour");
                 let now = new Date();
                 let openDate = new Date(openHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
                 let closeDate = new Date(closeHour + " " + now.getFullYear() + "/" + now.getMonth() + "/" + now.getDate());
@@ -253,7 +253,7 @@ app.post('/webhook', (req, res) => {
                 }
               }
               else if (value == "speciality") {
-                let recommendations = await queryRecommendation();
+                let recommendations = queryRecommendation();
                 let message = "Today's speciality(s): \n";
                 for (i = 0; i < recommendations.length; i++) {
                   message += indexs[recommendations[i]['FoodType']];
@@ -264,14 +264,14 @@ app.post('/webhook', (req, res) => {
                 sendTextMessage(sender, message);
               }
               else if (value == "info") {
-                let location = 'Location: ' + await queryInfo("location");
-                let contactNumber = 'Contact number: ' + await queryInfo("contact number");
-                let businessHour = 'Business hour: ' + await queryInfo("business hour");
+                let location = 'Location: ' + queryInfo("location");
+                let contactNumber = 'Contact number: ' + queryInfo("contact number");
+                let businessHour = 'Business hour: ' + queryInfo("business hour");
                 let info = location + '\n' + contactNumber + '\n' + businessHour;
                 sendTextMessage(sender, info);
               }
               else {
-                let info = await queryInfo(value);
+                let info = queryInfo(value);
                 console.log(info);
                 sendTextMessage(sender, info);
               }
@@ -435,7 +435,7 @@ function callSendAPI(messageData) {
 
 async function queryInfo(key) {
   var answer = "";
-  pool.getConnection(function(err,con) {
+  await pool.getConnection(function(err,con) {
     if (err){
       console.log(err);
     }else{
