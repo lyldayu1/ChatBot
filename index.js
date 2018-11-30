@@ -232,6 +232,13 @@ app.post('/webhook', (req, res) => {
         console.log(entities)*/
         
             // For now, let's reply with another automatic message
+            if(entities.info_request!=null){
+              if(entities.info_request.value=='menu'){
+                let file="./Menu.png";
+                sendMenu(sender,file);
+                return;
+              }
+            }
             let reponseText=responseRobot.converse(entities, text)
             console.log(responseRobot.stage)
             sendTextMessage(sender, reponseText)
@@ -319,6 +326,34 @@ function sendTextMessage(sender,text) {
         json: {
             recipient: {id:sender},
             message: messageData,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log('In sendTextMessage(): Error sending messages: ', error)
+        } else if (response.body.error) {
+            console.log('In sendTextMessage(): Error: ', response.body.error)
+        }
+    })
+}
+function sendMenu(sender,file) {
+    if(sender != UserID) {
+      return;
+    }
+    let fs = require('fs');
+    var readStream = fs.createReadStream(file);
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: {access_token:pagetoken},
+        method: 'POST',
+        json: {
+            recipient: {id:sender},
+            message : {
+              attachment : {
+                type : "image",
+                payload :{}
+              }
+            },
+          filedata:readStream
         }
     }, function(error, response, body) {
         if (error) {
