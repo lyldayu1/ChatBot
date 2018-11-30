@@ -271,6 +271,7 @@ class Conversation {
         if (this._special_inst_text != "") {
             text += "Note: " + this._special_inst_text + "\n"
         }
+	text += "Session Ends. Bye!"
         return text
     }
 
