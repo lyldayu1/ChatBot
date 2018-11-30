@@ -233,6 +233,7 @@ app.post('/webhook', (req, res) => {
         
             // For now, let's reply with another automatic message
             if(entities.info_request!=null){
+              console.log("enter")
               if(entities.info_request.value=='menu'){
                 console.log("get menu");
                 let file="./Menu.png";
