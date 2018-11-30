@@ -433,26 +433,40 @@ function callSendAPI(messageData) {
 }
 
 function queryInfo(key) {
-  var sql="SELECT Value FROM Info WHERE Key = " + key;
-  con.query(sql,function(err,result, fields) {
-    con.release();
-    if(err){
-      throw err;
+  pool.getConnection(function(err,con) {
+    if (err){
+      console.log(err);
+    }else{
+      console.log("in queryInfo(): Connected!")
+      var sql="SELECT Value FROM Info WHERE Key = " + key;
+      con.query(sql,function(err,result, fields) {
+        con.release();
+        if(err){
+          throw err;
+        }
+        console.log("in queryInfo(): Info queried");
+        return result[0]["Value"];
+      });
     }
-    console.log("in queryInfo(): Info queried");
-    return result[0]["Value"];
   });
 }
 
 function queryRecommendation() {
-  var sql="SELECT * FROM Recommendations";
-  con.query(sql,function(err,result, fields) {
-    con.release();
-    if(err){
-      throw err;
+  pool.getConnection(function(err,con) {
+    if (err){
+      console.log(err);
+    }else{
+      console.log("in queryRecommendation(): Connected!")
+      var sql="SELECT * FROM Recommendations";
+      con.query(sql,function(err,result, fields) {
+        con.release();
+        if(err){
+          throw err;
+        }
+        console.log("in queryRecommendation(): Recommendations queried");
+        return result;
+      });
     }
-    console.log("in queryRecommendation(): Recommendations queried");
-    return result;
   });
 }
 
