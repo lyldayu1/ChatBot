@@ -552,6 +552,10 @@ var pool = mysql.createPool({
 //APIs for Fronet End
 
 //DataBase Connection Testing
+app.get('/main', (req, res) => {
+	res.sendFile('public/index.html');
+});
+
 app.get('/test', (req, res) => {
     //res.send("test successed!");
     pool.getConnection((err, con) => {
