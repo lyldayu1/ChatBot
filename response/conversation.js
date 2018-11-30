@@ -256,7 +256,7 @@ class Conversation {
                 temp_text = price_chart[primary_type][food.drink_type]
             }
             total_price += temp_text
-            text += "- $" + temp_text + "\t" +
+            text += "$" + temp_text + "\t" +
                     food.customerReport() + "\n"
         }
         // TOTAL PRICE
