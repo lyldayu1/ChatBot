@@ -52,20 +52,16 @@ const INFO_REQ = "info_request"
 const FEEDBACK = "feedback"
 const YN_LIST = "conversationEnd"
 const SIZE_LIST = "size_type"
+const FORTOGO = "order_toGO"
+const FORHERE = "order_forHere"
 const YES = "yes"
 const NO = "no"
 // RESP_MACROS
 const ORDER_CONFIRM = [
-    // Do not forget the ending whitespace and new line
-    // followed by Order.curstomerReport()
-    "Please confirm your order: \n",
-    "Your order is: \n",
-    "Here is your order: \n",
-    "Let's double check your order: \n"
+    "Your order is:",
+    "Here is your order:",
 ]
 const APPEND_CONFIRM = [
-    // Do not forget the starting whitespace
-    // preceded by Order.customerReport()
     " Is that correct?",
     " Would that be correct?",
     " Everything correct?"
@@ -73,6 +69,9 @@ const APPEND_CONFIRM = [
 const SPECIAL_INST = [
     "Do you need any sauces? More ketchup packets?",
     "Need any sauces? Or more ketchup packets?"
+]
+const TOGO = [
+    "For here or to go?"
 ]
 const ORDER_FINISHED = [
     "Thank you so much! Your order is now finished!",
@@ -127,6 +126,7 @@ class Conversation {
         this._id = Math.floor(Math.random()*1000000)
         this._restaurant = new _restaurant_data_module()
         this._order = new _order_data_module()
+        this._togo = false
         this._dishno = 0
         this._reservation = new _reservation_data_module()
         this._feedback = new _feedback_data_module()
@@ -222,7 +222,7 @@ class Conversation {
             signal = tuple.signal
             text = tuple.text
         } else if (primary_stage == 9) {
-            return new ReturnTuple(-1, randomArrayPicker(ORDER_FINISHED))
+            return new ReturnTuple(0, this._conversationReport())
         } else {
             console.log("ERROR: In _converse(), invalid primary stage number.")
             return new ReturnTuple(1, text)
@@ -233,6 +233,45 @@ class Conversation {
             return new ReturnTuple(1, text)
         }
         return new ReturnTuple(0, text)
+    }
+
+    _conversationReport() {
+        // ORDER_REITERATE
+        var text = randomArrayPicker(ORDER_CONFIRM) + "\n"
+        var total_price = 0
+        // EACH DISH PRICE
+        for (var i = 0; i < this._order.dishlist.length; i ++) {
+            var temp_text = ""
+            var food = this._order.dishlist[i]
+            var primary_type = food.type
+            var secondary_type = food.food_type
+            var price_chart = this._restaurant._prices
+            if (primary_type == "Burger") {
+                temp_text = price_chart[secondary_type]
+            } else if (primary_type == "Fries") {
+                temp_text = price_chart[primary_type]
+            } else if (primary_type == "Drink") {
+                temp_text = price_chart[primary_type][food.size]
+            } else if (primary_type == "UnsizeableDrink") {
+                temp_text = price_chart[primary_type][food.drink_type]
+            }
+            total_price += temp_text
+            text += "- $" + temp_text + "\t" +
+                    food.customerReport() + "\n"
+        }
+        // TOTAL PRICE
+        text += "Total: $" + total_price + "\n"
+        // TOGO FORHERE
+        if (this._order._togo == true) {
+            text += "Togo \n"
+        } else {
+            text += "Dine-in \n"
+        }
+        // NOTE
+        if (this._special_inst_text != "") {
+            text += "Note: " + this._special_inst_text + "\n"
+        }
+        return text
     }
 
     _converse_ps1(recv) {
@@ -342,6 +381,8 @@ class Conversation {
             return this._converse_s301(recv)
         } else if (progress_stage == 2) {
             return this._converse_s302(recv)
+        } else if (progress_stage == 3) {
+            return this._converse_s303(recv)
         } else {
             // Bot is confused, stage stays at the current stage
             this._bot_confused = true
@@ -439,28 +480,32 @@ class Conversation {
     }
 
     _converse_s301(recv) {
-        // TODO: change order
+        // Special instruction
         var yn = this._yn_parsing(recv)
         if (yn == 1) {
-            this.stage = 302
-        } else if (yn == 0) {
-            this.stage = 301
-        } else {
-            // BOT CONFUSED
-            this._bot_confused = true
+			// Explicit and inexplicit special inst
+            this._special_inst_text = this._current_text
         }
+        this.stage = 302
         return 0
     }
 
     _converse_s302(recv) {
-        var yn = this._yn_parsing(recv)
-        if (yn == 0) {
-            this.stage = 999
-        } else {
-            // Explicit and inexplicit special inst.
-            this._special_inst_text = this._current_text
-            this.stage = 999
-        }
+        // For here or togo
+		if (FORTOGO in recv) {
+			this._togo = true
+		} else if (FORHERE in recv) {
+			this._togo = false
+		} else {
+			this._bot_confused = true
+		}
+		this.stage = 999
+        return 0
+    }
+
+    _converse_s303(recv) {
+		// Print order
+		this.stage = 999
         return 0
     }
 
@@ -511,13 +556,12 @@ class Conversation {
     _response_ps3(recv) {
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
-            return new ReturnTuple(0,
-                                   randomArrayPicker(ORDER_CONFIRM) +
-                                   this._order.customerReport() + 
-                                   randomArrayPicker(APPEND_CONFIRM))
-        } else if (progress_stage == 2) {
             return new ReturnTuple(0, randomArrayPicker(SPECIAL_INST))
-        }
+        } else if(progress_stage == 2) {
+            return new ReturnTuple(0, randomArrayPicker(TOGO))
+        } //else if (progress_stage == 3) {
+
+        //}
     }
 
     _yn_parsing(recv) {

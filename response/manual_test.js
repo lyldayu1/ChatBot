@@ -22,7 +22,7 @@ async function interpret(l) {
         let ret = await wit.message(s).then(({entities}) => {
             // console.log(entities)
             console.log("USER: " + s)
-            console.log(" BOT: " + Conversation.converse(entities).text)
+            console.log(" BOT: " + Conversation.converse(entities, s).text)
             // console.log(Conversation.stage)
             // console.log(Conversation._order.dishlist[0].print())
         })
@@ -30,7 +30,7 @@ async function interpret(l) {
             console.error('Error from Wit: ', err.stack || err);
         })
     }
-    // console.log(Conversation._order.customerReport())
+    // console.log(Conversation._order.dishlist[0].print())
     console.log("=============== Conversation Ends ==================")
 }
 
@@ -58,15 +58,16 @@ var l2 = [
 
 var l3 = [
     // Ordering one dish with multiple related attributes in one sentence
-    "i'd like a burger",
+    "i'd like a burger without onions",
     "No",
-    "no onions",
     "yes",
     "some fries please",
     "yes, a medium drink",
     "no",
+    "yes some sauces would be nice",
+    "to go",
 ]
 
 console.log("=============== Conversation Starts ================")
 console.log(" BOT: Hi. This is WaitressX. What do you need today?")
-interpret(l1)
+interpret(l3)

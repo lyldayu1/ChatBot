@@ -76,6 +76,7 @@ module.exports = class Order {
     }
 
     customerReport() {
+        // DEPRECATED
         var text = ""
         if (this.dishlist.length == 1) {
             var temp_text = this.dishlist[0].customerReport()
@@ -399,7 +400,20 @@ class Burger {
         } else {
             onion = "with extra onion"
         }
-        var text = String(this.food_type) + ", " + onion + "."
+        var lettuce = ""
+        if (this.lettuce == 0) {
+            lettuce = ", no lettuce"
+        } else if (this.lettuce == 2) {
+            lettuce = ", extra lettuce"
+        }
+        var tomato = ""
+        if (this.tomato == 0) {
+            tomato = ", no tomato"
+        } else if (this.tomato == 2) {
+            tomato = ", extra tomato"
+        }
+        var text = String(this.food_type) + " " +
+                   onion + lettuce + tomato
         return text
     }
 
@@ -455,7 +469,7 @@ class Fries {
     }
 
     customerReport() {
-        return "Fries."
+        return "Fries"
     }
 
     whatIsNotFilled() {
@@ -483,12 +497,12 @@ class Drink {
 
     customerReport() {
         var size_correspond = {
-            0: "small",
-            1: "medium",
-            2: "large",
-            3: "extra large"
+            0: "Small",
+            1: "Medium",
+            2: "Large",
+            3: "Extra large"
         }
-        return size_correspond[this.size] + " fountain drink."
+        return size_correspond[this.size] + " fountain drink"
     }
 
     indexFill(attr_index, value) {
@@ -529,7 +543,7 @@ class UnsizeableDrink {
     }
 
     customerReport() {
-        return this.drink_type + "."
+        return this.drink_type
     }
 
     whatIsNotFilled() {
