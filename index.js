@@ -546,13 +546,23 @@ var pool = mysql.createPool({
 //APIs for Fronet End
 
 //host main page
-var path = require('path');
-app.use(express.static(path.join(__dirname, '/public/style')));
-app.use(express.static(path.join(__dirname, '/public')));
-
+//need to use express static moudle to fix, good for now
 app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html');
 });
+
+app.get('/index.js', (req, res) => {
+	res.sendFile(__dirname + '/public/index.js');
+});
+
+app.get('/style/accordian.pack.js', (req, res) => {
+	res.sendFile(__dirname + '/public/style/accordian.pack.js');
+});
+
+app.get('/style/style.js', (req, res) => {
+	res.sendFile(__dirname + '/public/style/style.js');
+});
+
 
 app.get('/test', (req, res) => {
     //res.send("test successed!");
