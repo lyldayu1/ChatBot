@@ -553,7 +553,8 @@ var pool = mysql.createPool({
 
 //DataBase Connection Testing
 app.get('/main', (req, res) => {
-	res.sendFile('public/index.html');
+	res.sendFile('/public/index.html');
+	});
 });
 
 app.get('/test', (req, res) => {
