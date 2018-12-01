@@ -542,16 +542,11 @@ var pool = mysql.createPool({
 
 // });
 
-/* To do list
- *  1. Figure out how to connect database
- *  2. Get data from the data base (Json)
- *  3. Create a meaningful database structure
- *  4. Due by 11/06/2018
- */
 
 //APIs for Fronet End
 
-//DataBase Connection Testing
+//host main page
+app.use(express.static(path.join(__dirname, 'public')));
 app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html');
 });
