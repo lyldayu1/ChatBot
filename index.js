@@ -551,7 +551,7 @@ app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html');
 });
 
-app.get('/index.js', (req, res) => {
+app.get('/home.js', (req, res) => {
 	//res.sendFile(__dirname + '/public/index.js');
 	res.send('what?');
 });
