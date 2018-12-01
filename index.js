@@ -559,8 +559,8 @@ app.get('/style/accordian.pack.js', (req, res) => {
 	res.sendFile(__dirname + '/public/style/accordian.pack.js');
 });
 
-app.get('/style/style.js', (req, res) => {
-	res.sendFile(__dirname + '/public/style/style.js');
+app.get('/style/style.css', (req, res) => {
+	res.sendFile(__dirname + '/public/style/style.css');
 });
 
 
