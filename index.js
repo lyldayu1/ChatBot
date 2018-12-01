@@ -552,7 +552,8 @@ app.get('/main', (req, res) => {
 });
 
 app.get('/index.js', (req, res) => {
-	res.sendFile(__dirname + '/public/index.js');
+	//res.sendFile(__dirname + '/public/index.js');
+	res.send('what?');
 });
 
 app.get('/style/accordian.pack.js', (req, res) => {
