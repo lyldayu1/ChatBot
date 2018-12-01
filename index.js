@@ -547,9 +547,6 @@ var pool = mysql.createPool({
 
 //host main page
 //need to use express static moudle to fix, good for now
-var path = require('path');
-app.use(express.static(path.join(__dirname, '/public/style'))
-
 app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html');
 });
@@ -562,9 +559,9 @@ app.get('/style/accordian.pack.js', (req, res) => {
 	res.sendFile(__dirname + '/public/style/accordian.pack.js');
 });
 
-//app.get('/style/style.css', (req, res) => {
-//	res.sendFile(__dirname + '/public/style/style.css');
-//});
+app.get('/style/style.css', (req, res) => {
+	res.sendFile(__dirname + '/public/style/style.css');
+});
 
 
 app.get('/test', (req, res) => {
