@@ -547,8 +547,8 @@ var pool = mysql.createPool({
 
 //host main page
 var path = require('path');
-app.use(express.static(path.join(__dirname, 'public/style')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public/style')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html');
