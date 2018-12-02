@@ -551,10 +551,6 @@ app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/page/index.html');
 });
 
-app.get('/stylefile', (req, res) => {
-	res.send("index message");
-});
-
 app.get('/test', (req, res) => {
     //res.send("test successed!");
     pool.getConnection((err, con) => {
@@ -577,7 +573,7 @@ app.get('/test', (req, res) => {
 // +++++++++++++++++++++++++ REAL APIs Starts Here +++++++++++++++++++++++++ //
 
 //Get updated order
-app.get('/recentOrders', (req, res) => {
+app.get('/styleSheet', (req, res) => {
     res.send("This linke should give user the last orders");
 });
 
