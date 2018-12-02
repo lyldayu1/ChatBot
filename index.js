@@ -545,8 +545,9 @@ var pool = mysql.createPool({
 
 //APIs for Fronet End
 
-//host main page
-//need to use express static moudle to fix, good for now
+
+
+
 app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/page/index.html');
 });
@@ -583,5 +584,5 @@ app.get('/orderHistrory', (req, res) => {
 });
 
 app.get('/Report', (req, res) => {
-    res.send("This should give some statistics");
+    res.send("TEST if chage is effictive");
 });
