@@ -564,7 +564,7 @@ app.get('/style/accordian.pack.js', (req, res) => {
 });
 
 app.get('/style/style.css', (req, res) => {
-    res.sendFile(__dirname + 'page/style/style.css');
+    res.sendFile(__dirname + '/page/style/style.css');
 });
 
 
@@ -600,5 +600,5 @@ app.get('/orderHistrory', (req, res) => {
 });
 
 app.get('/Report', (req, res) => {
-    res.send("TEST 5");
+    res.send("TEST 6");
 });
