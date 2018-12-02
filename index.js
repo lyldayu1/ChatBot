@@ -558,6 +558,14 @@ app.get('/index.js', (req, res) => {
     res.sendFile(__dirname + '/page/index.js');
 });
 
+app.get('/style/accordian.pack.js', (req, res) => {
+    res.sendFile(__dirname + '/page/style/accordian.pack.js');
+});
+
+app.get('/style/style.css', (req, res) => {
+    res.sendFile(__dirname + 'page/style/style.css');
+});
+
 
 app.get('/test', (req, res) => {
     //res.send("test successed!");
@@ -591,5 +599,5 @@ app.get('/orderHistrory', (req, res) => {
 });
 
 app.get('/Report', (req, res) => {
-    res.send("TEST 1");
+    res.send("TEST 2");
 });
