@@ -600,5 +600,5 @@ app.get('/orderHistrory', (req, res) => {
 });
 
 app.get('/Report', (req, res) => {
-    res.send("TEST 6");
+    res.send("TEST 7");
 });
