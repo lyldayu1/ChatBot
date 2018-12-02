@@ -548,20 +548,20 @@ var pool = mysql.createPool({
 //host main page
 //need to use express static moudle to fix, good for now
 app.get('/main', (req, res) => {
-	res.sendFile(__dirname + '/public/index.html');
+	res.sendFile(__dirname + '/page/index.html');
 });
 
-app.get('/indexjs', (req, res) => {
-	//res.sendFile(__dirname + '/public/index.js');
-	res.send('what?');
+app.get('/index.js', (req, res) => {
+	//res.sendFile(__dirname + "/page/index.js");
+	res.send("test for index");
 });
 
 app.get('/style/accordian.pack.js', (req, res) => {
-	res.sendFile(__dirname + '/public/style/accordian.pack.js');
+	res.sendFile(__dirname + "/page/style/accordian.pack.js");
 });
 
 app.get('/style/style.css', (req, res) => {
-	res.sendFile(__dirname + '/public/style/style.css');
+	res.sendFile(__dirname + "/page/style/style.css");
 });
 
 
