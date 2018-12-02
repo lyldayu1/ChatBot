@@ -545,12 +545,19 @@ var pool = mysql.createPool({
 
 //APIs for Fronet End
 
+// -------------------------------------- Front Page Support API Starts Here ---------------------------------//
 
-
+//TO List: support css file, index.js file. Maunally add the CSS file and JS file
+// Warning: should use static method come with Exoress, good for now
 
 app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/page/index.html');
 });
+
+app.get('/index.js', (req, res) => {
+    res.sendFile(__dirname + '/page/index.js');
+});
+
 
 app.get('/test', (req, res) => {
     //res.send("test successed!");
