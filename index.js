@@ -551,7 +551,7 @@ app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/page/index.html');
 });
 
-app.get('/index', (req, res) => {
+app.get('/stylefile', (req, res) => {
 	res.send("index message");
 });
 
