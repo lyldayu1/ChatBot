@@ -549,6 +549,7 @@ var pool = mysql.createPool({
 
 //TO List: support css file, index.js file. Maunally add the CSS file and JS file
 // Warning: should use static method come with Exoress, good for now
+app.use(express.static(__dirname + 'page/style'));
 
 app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/page/index.html');
@@ -599,5 +600,5 @@ app.get('/orderHistrory', (req, res) => {
 });
 
 app.get('/Report', (req, res) => {
-    res.send("TEST 3");
+    res.send("TEST 4");
 });
