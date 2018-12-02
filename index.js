@@ -551,7 +551,7 @@ app.get('/main', (req, res) => {
 	res.sendFile(__dirname + '/page/index.html');
 });
 
-app.get('/index.js', (req, res) => {
+app.get('/index', (req, res) => {
 	//res.sendFile(__dirname + "/page/index.js");
 	res.send("test for index");
 });
