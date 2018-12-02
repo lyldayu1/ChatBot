@@ -552,18 +552,8 @@ app.get('/main', (req, res) => {
 });
 
 app.get('/index', (req, res) => {
-	//res.sendFile(__dirname + "/page/index.js");
-	res.send("test for index");
+	res.send("index message");
 });
-
-app.get('/style/accordian.pack.js', (req, res) => {
-	res.sendFile(__dirname + "/page/style/accordian.pack.js");
-});
-
-app.get('/style/style.css', (req, res) => {
-	res.sendFile(__dirname + "/page/style/style.css");
-});
-
 
 app.get('/test', (req, res) => {
     //res.send("test successed!");
