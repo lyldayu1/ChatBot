@@ -573,7 +573,7 @@ app.get('/test', (req, res) => {
 // +++++++++++++++++++++++++ REAL APIs Starts Here +++++++++++++++++++++++++ //
 
 //Get updated order
-app.get('/styleSheet', (req, res) => {
+app.get('/orders', (req, res) => {
     res.send("This linke should give user the last orders");
 });
 
