@@ -315,10 +315,10 @@ app.post('/webhook', (req, res) => {
               return
             }
 
-            let reponseTuple = responseRobot.converse(entities, text)
-            let reponseText = reponseTuple.text
+            let responseTuple = responseRobot.converse(entities, text)
+            let responseText = responseTuple.text
             console.log(responseRobot.stage)
-            sendTextMessage(sender, reponseText)
+            sendTextMessage(sender, responseText)
             if(responseRobot.stage == 999){
               restartFlag = 1
               let resultTuple = responseRobot._order.whatIsNotFilled()
