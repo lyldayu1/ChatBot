@@ -41,28 +41,38 @@ function showOrders() {
     var request = new XMLHttpRequest();
     request.open('GET', 'https://afternoon-atoll-58440.herokuapp.com/test', true);
     request.responseType = 'json';
-       request.onload = function () {
-           if (this.status == 200) {
-               console.log(this.response);
-               var htmlDoc = "<h2>Show the current orders below: </h2> <h2> Time &nbsp;&nbsp;&nbsp;&nbsp;Orders </h2>"; 
-               var n = this.response.length;
-               for (let i = 1; i <= n; i++) {
-                   console.log(i);
-                   htmlDoc = htmlDoc + "<h4>" + convertTime(this.response[n - i]["Time"]) + " : " + foodMap[this.response[n - i]["FoodType"]] +  "</h4>";
-               }
-               document.getElementById('display_orders').innerHTML = htmlDoc;
-
-               
+    request.onload = function () {
+        if (this.status == 200) {
+            console.log(this.response);
+            var htmlDoc = "<h2>Show the current orders below: </h2>";
+            var n = this.response.length;
+            if (n > 15) {
+                var m = 15;
             }
+            else {
+                var m = n;
+            }
+
+            htmlDoc += "<table><tr><th>Order Number</th><th>Time</th><th>Content</th></tr>"
+
+            for (let i = 1; i <= m; i++) {
+                console.log(i);
+                htmlDoc = htmlDoc + "<tr><th>" + (this.response[n - i]['OID'] + this.response[n - i]["Time"]) + "</th><th>" + convertTime(this.response[n - i]["Time"]) + " </th><th> " + foodMap[this.response[n - i]["FoodType"]] + "</th></tr>";
+            }
+            htmlDoc += "</table>"
+            document.getElementById('display_orders').innerHTML = htmlDoc;
+
+
         }
+    }
     request.send();
-   
+
 };
 
 function showSales() {
     console.log("show_sales_clicked");
     var salesMap = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0 };
- 
+
     var request = new XMLHttpRequest();
     request.open('GET', 'https://afternoon-atoll-58440.herokuapp.com/test', true);
     request.responseType = 'json';
@@ -74,13 +84,15 @@ function showSales() {
                 salesMap[this.response[i]["FoodType"]] += this.response[i]["Price"]
             }
 
-            var htmlDoc = "<br /><h3> Show Sales Figures </h3><h2> Food Type &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Total Sales </h2>";
+            var htmlDoc = "<br /><h3> Show Sales Figures </h3>";
+            htmlDoc += "<table><tr><th>Food Type</th><th>Total Sales</th></tr>";
             for (keys in salesMap) {
                 if (salesMap[keys] != 0) {
-                    htmlDoc += "<h4>" + foodMap[keys] + ":&nbsp;&nbsp;&nbsp;$" + salesMap[keys] + "</h4>"
-                } 
-                
+                    htmlDoc += "<tr><th>" + foodMap[keys] + "</th><th>" + Math.round(salesMap[keys] * 100) / 100 + "</th></tr>"
+                }
+
             }
+            htmlDoc += "</table>";
             document.getElementById('display_sales').innerHTML = htmlDoc;
 
 
