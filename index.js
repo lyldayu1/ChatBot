@@ -296,7 +296,7 @@ app.post('/webhook', (req, res) => {
               }
               return;
             }
-            else if (entities.give_recommendation!=null){
+            else if (entities.give_recommendation != null) {
               queryRecommendation(function(result) {
                 var recommendations = result;
                 var message = "Today's speciality(s): \n";
@@ -309,6 +309,10 @@ app.post('/webhook', (req, res) => {
                 sendTextMessage(sender, message);
               });
               return;
+            }
+            else if (entities.restart != null) {
+              responseRobot=require('./response/conversation')
+              return
             }
 
             let reponseTuple = responseRobot.converse(entities, text)
