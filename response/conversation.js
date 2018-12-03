@@ -276,7 +276,7 @@ class Conversation {
     }
 
     _converse_ps1(recv) {
-        if (ORDER in recv) {
+        if ((ORDER in recv) || ("food_type" in recv)) {
             // Make order (201 - 203, 209)
             // 201 = Require food type
             // 202 = Require additional info
