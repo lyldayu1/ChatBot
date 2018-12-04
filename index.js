@@ -30,14 +30,14 @@ const findOrCreateSession = (fbid) => {
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
     // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    sendTextMessage(fbid, "Hi. This is WaitriX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
   if(sessionId && flag === 0 && restartFlag === 1)
   {
     flag = 1
     // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    sendTextMessage(fbid, "Hi. This is WaitriX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
   return sessionId;
@@ -311,7 +311,10 @@ app.post('/webhook', (req, res) => {
               return;
             }
             else if (entities.restart != null) {
-              responseRobot=require('./response/conversation')
+              console.log("Restart");
+              responseRobot=require('./response/conversation');
+              flag = 0;
+              restartFlag = 1;
               return
             }
 
