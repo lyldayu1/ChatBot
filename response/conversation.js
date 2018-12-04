@@ -243,7 +243,7 @@ class Conversation {
         for (var i = 0; i < this._order.dishlist.length; i ++) {
             var temp_text = ""
             var food = this._order.dishlist[i]
-            console.log("Print result: " + food);
+            console.log("Print result: " + food.print());
             var primary_type = food.type
             var secondary_type = food.food_type
             var price_chart = this._restaurant._prices
