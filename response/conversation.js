@@ -245,7 +245,9 @@ class Conversation {
             var food = this._order.dishlist[i]
             console.log("Print result: " + food.print());
             var primary_type = food.type
+            console.log("primary type: " + primary_type.toString())
             var secondary_type = food.food_type
+            console.log("secondary type: " + secondary_type.toString())
             var price_chart = this._restaurant._prices
             if (primary_type == "Burger") {
                 temp_text = price_chart[secondary_type]
