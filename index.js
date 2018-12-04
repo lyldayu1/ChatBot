@@ -312,7 +312,7 @@ app.post('/webhook', (req, res) => {
             }
             else if (entities.restart != null) {
               console.log("Restart");
-              responseRobot=require('./response/conversation');
+              responseRobot = responseRobot.renew();
               flag = 0;
               restartFlag = 1;
               return
