@@ -250,10 +250,7 @@ class Conversation {
             console.log("secondary type: " + secondary_type.toString())
             var price_chart = this._restaurant._prices
             if (primary_type == "Burger") {
-                if(food.if_combo)
-                    temp_text = price_chart[secondary_type + " Combo"]
-                else
-                    temp_text = price_chart[secondary_type]
+                temp_text = price_chart[secondary_type]
             } else if (primary_type == "Fries") {
                 temp_text = price_chart[primary_type]
             } else if (primary_type == "Drink") {
