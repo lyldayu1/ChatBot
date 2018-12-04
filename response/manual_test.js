@@ -50,16 +50,17 @@ var l1 = [
 
 var l2 = [
     // Ordering one dish with multiple related attributes in one sentence
-    "i want cheeseburger combo with extra onions",
+    "i want cheeseburger with extra onions",
+    "yes",
     "no",
     "yes",
-    "no"
+    "for here"
 ]
 
 var l3 = [
     // Ordering one dish with multiple related attributes in one sentence
     "i'd like a burger without onions",
-    "No",
+    "combo",
     "yes",
     "some fries please",
     "yes, a medium drink",

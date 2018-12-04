@@ -12,19 +12,24 @@
  *     9: completed
  * B = 0: making order
  *     1: making reservation
- *     2: request restaurant info
+ *     2: request restaurant info (not used)
  *     3: recording feedback
- * C = 1: determining main attribute (food type for order)
- *     2: determining additional info (onions, cheese, etc.)
- *     3: dish / reservation confirmation
- *     9: ask if anything else
+ * C = (If A == 2)
+ *       1: determining main attribute (food type for order)
+ *       2: determining additional info (onions, cheese, etc.)
+ *       3: dish / reservation confirmation (not used)
+ *       9: ask if anything else
+ *     (If A == 3)
+ *       1: determining additional order info (sauces, etc.)
+ *       2: determining for here / togo
+ *       3: print out order info and end session
  * all valid_stages = new Set([
  *     101, 102,            // greeting
  *     201, 202, 203, 209,  // ordering
  *     211, 212, 213, 219,  // reservation
  *     221, 222, 223, 229,  // info
  *     231, 232, 233, 239,  // feedback
- *     301, 302,            // confirmation
+ *     301, 302, 303        // confirmation
  *     999])                // completed
  */
 
@@ -105,6 +110,8 @@ class Conversation {
      *      Restaurant class object (info_restaurant.js)
      *  @param {object} this._order:
      *      Order class object (info_order.js)
+     *  @param {object} this._togo:
+     *      Flag if this is a togo order
      *  @param {integer} this._dishno:
      *      Current dish index for this._order.dishlist
      *  @param {object} this._reservation:
@@ -154,7 +161,7 @@ class Conversation {
          * @param {String} text:
          *      Text message.
          * 
-         * @return {(Integer, String)}:
+         * @return {ReturnTuple}:
          *      Status code and the response text from _converse().
          *      Will return status code -1 if this.stage == 999.
          */
@@ -178,7 +185,7 @@ class Conversation {
          * @param {String} text:
          *      Text message.
          * 
-         * @return {(Integer, String)}:
+         * @return {ReturnTuple}:
          *      Status code and the response text.
          */
         this._current_text = text
@@ -236,6 +243,7 @@ class Conversation {
     }
 
     _conversationReport() {
+        /* Return the order summary if called */
         // ORDER_REITERATE
         var text = randomArrayPicker(ORDER_CONFIRM) + "\n"
         var total_price = 0
@@ -274,11 +282,13 @@ class Conversation {
         if (this._special_inst_text != "") {
             text += "Note: " + this._special_inst_text + "\n"
         }
-	text += "Session Ends. Bye!"
+        text += "Hope you enjoy the order. Have a nice day!\n"
+        text += "To start a new session, simply greet me!" 
         return text
     }
 
     _converse_ps1(recv) {
+        /* understanding workflow in primary stage 1 */
         if ((ORDER in recv) || ("food_type" in recv)) {
             // Make order (201 - 203, 209)
             // 201 = Require food type
@@ -335,6 +345,7 @@ class Conversation {
     }
 
     _converse_ps2(recv) {
+        /* understanding workflow in primary stage 2 */
         var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
         if (secondary_stage == 0) {
@@ -380,6 +391,7 @@ class Conversation {
     }
 
     _converse_ps3(recv) {
+        /* understanding workflow in primary stage 3 */
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
             return this._converse_s301(recv)
@@ -395,6 +407,7 @@ class Conversation {
     }
 
     _converse_s201(recv) {
+        /* understanding workflow in stage 201 */
         var res = 0
         res = this._order.addFill(recv)
         if (res == 1) {
@@ -413,6 +426,7 @@ class Conversation {
     }
 
     _converse_s202(recv) {
+        /* understanding workflow in stage 202 */
         this._order.fill(this._dishno, recv)
         var tuple = this._order.whatIsNotFilled()
         var index = tuple.index
@@ -426,6 +440,7 @@ class Conversation {
     }
 
     _converse_s209(recv) {
+        /* understanding workflow in stage 209 */
         var yn = this._yn_parsing(recv)
         if (yn == 0) {
             // Only when explicitly declaring NO
@@ -484,6 +499,7 @@ class Conversation {
     }
 
     _converse_s301(recv) {
+        /* understanding workflow in stage 301 */
         // Special instruction
         var yn = this._yn_parsing(recv)
         if (yn == 1) {
@@ -495,6 +511,7 @@ class Conversation {
     }
 
     _converse_s302(recv) {
+        /* understanding workflow in stage 302 */
         // For here or togo
 		if (FORTOGO in recv) {
 			this._togo = true
@@ -508,16 +525,19 @@ class Conversation {
     }
 
     _converse_s303(recv) {
-		// Print order
+        /* understanding workflow in stage 303 */
+        // Nothing to do here, advance to stage 999
 		this.stage = 999
         return 0
     }
 
-    _response_ps1() {
+    _response_ps1(recv) {
+        /* understanding workflow in primary stage 1 */
         return new ReturnTuple(0, "")
     }
 
     _response_ps2(recv) {
+        /* understanding workflow in primary stage 2 */
         var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
         if (secondary_stage == 0) {
@@ -554,21 +574,27 @@ class Conversation {
             return _feedback_resp_module(
                 progress_stage
             )
+        } else {
+            console.log("ERROR: In _response_ps2(), invalid progress stage number.")
+            return -1   
         }
     }
 
     _response_ps3(recv) {
+        /* understanding workflow in primary stage 3 */
         var progress_stage = this.stage % 10
         if (progress_stage == 1) {
             return new ReturnTuple(0, randomArrayPicker(SPECIAL_INST))
         } else if(progress_stage == 2) {
             return new ReturnTuple(0, randomArrayPicker(TOGO))
-        } //else if (progress_stage == 3) {
-
-        //}
+        } else {
+            console.log("ERROR: In _response_ps3(), invalid progress stage number.")
+            return -1
+        }
     }
 
     _yn_parsing(recv) {
+        /* parse positive and negative response in recv */
         // Case 1: yn in size_type
         if (SIZE_LIST in recv) {
             if (recv.size_type[0].value == YES) {
@@ -615,14 +641,18 @@ class Conversation {
                 }
             }
         }
-        // This happens, but I consider this as a bad practise
+        // This happens, but I consider this to be a bad practise
         // return -1 if conversationEnd or size_type not in recv
         return -1
     }
 
     renew() {
+        /* Conversation instance in index.js is considered a singleton
+         * As such, a renew method is here to return a new instance
+         */
         return new Conversation();
     }
 }
 
+// Module Export
 module.exports = new Conversation()

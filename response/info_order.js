@@ -187,9 +187,25 @@ module.exports = class Order {
                 var res = this._yn_parsing(recv)
                 if (res == 1) {
                     food.indexFill(attr_index, 1)
+                    if (attr_index == 2) {
+                        // Correction for combo
+                        if (BURGER.includes(food_type)) {
+                            food.food_type = BURGER_COMBO[
+                                BURGER.indexOf(food_type)
+                            ]
+                        }
+                    }
                     return 0
                 } else if (res == 0) {
                     food.indexFill(attr_index, 0)
+                    if (attr_index == 2) {
+                        // Correction for combo
+                        if (BURGER_COMBO.includes(food_type)) {
+                            food.food_type = BURGER[
+                                BURGER_COMBO.indexOf(food_type)
+                            ]
+                        }
+                    }
                     return 0
                 }
                 // else, ignore this check and proceed to the next checks
@@ -275,28 +291,35 @@ module.exports = class Order {
             dish.if_combo = 1
             return 0
         } else {
-            console.log("ERROR: in _convertToCombo: " +
-                        "food_type not in BURGER.")
-            return 1
+            if (BURGER_COMBO.includes(dish.food_type)) {
+                dish.if_combo = 1
+                return 0
+            } else {
+                console.log("ERROR: In _convertToCombo(): " + 
+                            "invalid burger food_type")
+                return 1
+            }
         }
     }
 
     _convertToSandwich(dish) {
-        /* (Mostly obselete but implemented anyway)
-         * Directly change combo related attributes
+        /* Directly change combo related attributes
          * that is, dish.food_type and dish.if_combo
          * USE THIS FUNCTION TO MAKE COMBO RELATED CHANGES ONLY!
          */
-
-         // Check if food_type in combo (BURGER_COMBO)
          if (BURGER_COMBO.includes(dish.food_type)) {
              dish.food_type = BURGER[BURGER_COMBO.indexOf(dish.food_type)]
              dish.if_combo = 0
              return 0
          } else {
-             console.log("ERROR: in _convertToSandwich: " +
-                         "food_type not in BURGER_COMBO.")
-             return 1
+             if (BURGER.includes(dish.food_type)){
+                 dish.if_combo = 0
+                 return 0
+             } else {
+                 console.log("ERROR: In _convertToSandwich(): " + 
+                             "invalid burger food_type")
+                 return 1
+             }
          }
     }
 
