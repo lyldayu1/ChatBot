@@ -30,14 +30,14 @@ const findOrCreateSession = (fbid) => {
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
     // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    sendTextMessage(fbid, "Hi. This is WaitriX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
   if(sessionId && flag === 0 && restartFlag === 1)
   {
     flag = 1
     // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    sendTextMessage(fbid, "Hi. This is WaitriX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
   return sessionId;
@@ -296,7 +296,7 @@ app.post('/webhook', (req, res) => {
               }
               return;
             }
-            else if (entities.give_recommendation!=null){
+            else if (entities.give_recommendation != null) {
               queryRecommendation(function(result) {
                 var recommendations = result;
                 var message = "Today's speciality(s): \n";
@@ -310,11 +310,18 @@ app.post('/webhook', (req, res) => {
               });
               return;
             }
+            else if (entities.restart != null) {
+              console.log("Restart");
+              responseRobot=require('./response/conversation');
+              flag = 0;
+              restartFlag = 1;
+              return
+            }
 
-            let reponseTuple = responseRobot.converse(entities, text)
-            let reponseText = reponseTuple.text
+            let responseTuple = responseRobot.converse(entities, text)
+            let responseText = responseTuple.text
             console.log(responseRobot.stage)
-            sendTextMessage(sender, reponseText)
+            sendTextMessage(sender, responseText)
             if(responseRobot.stage == 999){
               restartFlag = 1
               let resultTuple = responseRobot._order.whatIsNotFilled()
