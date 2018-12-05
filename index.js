@@ -315,6 +315,7 @@ app.post('/webhook', (req, res) => {
               responseRobot = responseRobot.renew();
               flag = 0;
               restartFlag = 1;
+              sendTextMessage(sender, "Server has restarted. Please greet the bot to start over.");
               return
             }
 
