@@ -364,13 +364,13 @@ class Conversation {
             // Make reservation (211 - 213, 219)
             // 212 = Require additional info
             // 213 = Require confirmation
-            // 209 = Ask if anything else
+            // 219 = Ask if anything else
             this._reservation.fill(recv)
             var res = this._reservation.whatIsNotFilled()
             if (res != 0) {
                 this.stage = 212
             } else {
-                this.stage = 213
+                this.stage = 311
             }
             return 0
         } else if (secondary_stage == 2) {
@@ -392,17 +392,24 @@ class Conversation {
 
     _converse_ps3(recv) {
         /* understanding workflow in primary stage 3 */
+        var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
-        if (progress_stage == 1) {
-            return this._converse_s301(recv)
-        } else if (progress_stage == 2) {
-            return this._converse_s302(recv)
-        } else if (progress_stage == 3) {
-            return this._converse_s303(recv)
-        } else {
-            // Bot is confused, stage stays at the current stage
-            this._bot_confused = true
-            return 0
+        if (secondary_stage == 0) {
+            if (progress_stage == 1) {
+                return this._converse_s301(recv)
+            } else if (progress_stage == 2) {
+                return this._converse_s302(recv)
+            } else if (progress_stage == 3) {
+                return this._converse_s303(recv)
+            } else {
+                // Bot is confused, stage stays at the current stage
+                this._bot_confused = true
+                return 0
+            }
+        } else if (secondary_stage == 1) {
+            if (progress_stage == 1) {
+                return this._converse_s311(recv)
+            }
         }
     }
 
@@ -514,13 +521,14 @@ class Conversation {
         /* understanding workflow in stage 302 */
         // For here or togo
 		if (FORTOGO in recv) {
-			this._togo = true
+            this._togo = true
+            this.stage = 999
 		} else if (FORHERE in recv) {
-			this._togo = false
+            this._togo = false
+            this.stage = 999
 		} else {
 			this._bot_confused = true
 		}
-		this.stage = 999
         return 0
     }
 
@@ -529,6 +537,10 @@ class Conversation {
         // Nothing to do here, advance to stage 999
 		this.stage = 999
         return 0
+    }
+
+    _converse_s311(recv) {
+        
     }
 
     _response_ps1(recv) {
@@ -582,14 +594,21 @@ class Conversation {
 
     _response_ps3(recv) {
         /* understanding workflow in primary stage 3 */
+        var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
-        if (progress_stage == 1) {
-            return new ReturnTuple(0, randomArrayPicker(SPECIAL_INST))
-        } else if(progress_stage == 2) {
-            return new ReturnTuple(0, randomArrayPicker(TOGO))
-        } else {
-            console.log("ERROR: In _response_ps3(), invalid progress stage number.")
-            return -1
+        if (secondary_stage == 0) {
+            if (progress_stage == 1) {
+                return new ReturnTuple(0, randomArrayPicker(SPECIAL_INST))
+            } else if(progress_stage == 2) {
+                return new ReturnTuple(0, randomArrayPicker(TOGO))
+            } else {
+                console.log("ERROR: In _response_ps3(), invalid progress stage number.")
+                return -1
+            }
+        } else if (secondary_stage == 1) {
+            if (progress_stage == 1) {
+                return new ReturnTuple(0, this._reservation.customerReport())
+            }
         }
     }
 

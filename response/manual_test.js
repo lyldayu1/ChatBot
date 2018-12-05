@@ -23,7 +23,7 @@ async function interpret(l) {
             // console.log(entities)
             console.log("USER: " + s)
             console.log(" BOT: " + Conversation.converse(entities, s).text)
-            // console.log(Conversation.stage)
+            console.log(Conversation.stage)
             // console.log(Conversation._order.dishlist[0].print())
         })
         .catch((err) => {
@@ -50,11 +50,10 @@ var l1 = [
 
 var l2 = [
     // Ordering one dish with multiple related attributes in one sentence
-    "i want cheeseburger with extra onions",
-    "yes",
-    "no",
-    "yes",
-    "for here"
+    "reservation",
+    "name's Jason",
+    "5:00 pm tomorrow",
+    "five of them"
 ]
 
 var l3 = [
