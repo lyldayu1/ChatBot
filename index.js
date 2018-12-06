@@ -324,13 +324,13 @@ app.post('/webhook', (req, res) => {
             let responseText = responseTuple.text
 	    console.log(responseRobot._error_code)
 	    console.log(responseRobot.stage)
+            sendTextMessage(sender, responseText)
 	    if (responseRobot._error_code == 2011)
 	    {
 	      sendImageMessage(sender, "./Menu.png");
 	      responseRobot._error_code = 0
 	      return;
 	    }
-            sendTextMessage(sender, responseText)
             if(responseRobot.stage == 999){
               restartFlag = 1
               let resultTuple = responseRobot._order.whatIsNotFilled()
