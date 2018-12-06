@@ -285,7 +285,7 @@ class Conversation {
                     food.customerReport() + "\n"
         }
         // TOTAL PRICE
-        text += "Total: $" + total_price + "\n"
+        text += "Total: $" + total_price.toFixed(2) + "\n"
         // TOGO FORHERE
         if (this._order._togo == true) {
             text += "Togo \n"
