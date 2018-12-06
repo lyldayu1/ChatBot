@@ -338,18 +338,9 @@ app.post('/webhook', (req, res) => {
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
                   if(e[i].type=='Burger'){
-                    if(e[i].if_combo==1){
-                      let burgerName=e[i].food_type;
-                      let comboName=burgerName+" Combo";
-		      console.log("burgerName: " + burgerName)
-		      console.log("comboName: " + comboName)
-                      insertOrder(sender,sqltimestamp,1,indexs[comboName],prices[comboName],'');
-                    }else{
-
                       let burgerName=e[i].food_type;
 		      console.log("burgerName: " + burgerName)
                       insertOrder(sender,sqltimestamp,1,indexs[burgerName],prices[burgerName],'');
-                    }
                   }else if(e[i].type=='Fries'){
                     insertOrder(sender,sqltimestamp,1,3,1.6,'');
                   }else if(e[i].type=='Drink'){
