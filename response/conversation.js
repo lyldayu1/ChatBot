@@ -223,7 +223,6 @@ class Conversation {
                     ERROR_MSG[this._error_code]
             )
             this._bot_confused = false
-            this._error_code = 0
             return tuple
             
         }
