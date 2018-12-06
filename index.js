@@ -345,8 +345,9 @@ app.post('/webhook', (req, res) => {
 		      console.log("comboName: " + comboName)
                       insertOrder(sender,sqltimestamp,1,indexs[comboName],prices[comboName],'');
                     }else{
-		      console.log("burgerName: " + burgerName)
+
                       let burgerName=e[i].food_type;
+		      console.log("burgerName: " + burgerName)
                       insertOrder(sender,sqltimestamp,1,indexs[burgerName],prices[burgerName],'');
                     }
                   }else if(e[i].type=='Fries'){
