@@ -172,6 +172,7 @@ module.exports = class Order {
                 return 1
             }
         } else {
+            console.log("Bot confused at Order.addFill()")
             return 1
         }
     }

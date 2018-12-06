@@ -89,6 +89,10 @@ const BOT_CONFUSED = [
     "Sorry, I am confused.",
     "Sorry, I didn't get that."
 ]
+const ERROR_MSG = {
+    0: "",
+    2011: "We don't have this food, here is our menu:",
+}
 
 
 class ReturnTuple {
@@ -126,6 +130,8 @@ class Conversation {
      *      Flag if multiple dishes in dishlist
      *  @param {integer} this._bot_confused:
      *      Flag if bot is confused
+     *  @param {integer} this._error_code:
+     *      Error code of the current conversaion
      */
 
     constructor() {
@@ -141,6 +147,7 @@ class Conversation {
         this._special_inst_text = ""
         this._multiple_dish_flag = false
         this._bot_confused = false
+        this._error_code = 0
     }
 
     print() {
@@ -208,9 +215,17 @@ class Conversation {
             console.log("ERROR: converse_ps functions return non-zero.")
             this._bot_confused == true
         }
+        // Reset confused status
         if (this._bot_confused == true) {
+            var tuple = new ReturnTuple(
+                1,
+                randomArrayPicker(BOT_CONFUSED) + " " +
+                    ERROR_MSG[this._error_code]
+            )
             this._bot_confused = false
-            return new ReturnTuple(1, randomArrayPicker(BOT_CONFUSED))
+            this._error_code = 0
+            return tuple
+            
         }
         primary_stage = Math.floor(this.stage / 100)
         var signal = 0
@@ -419,6 +434,7 @@ class Conversation {
         res = this._order.addFill(recv)
         if (res == 1) {
             this._bot_confused = true
+            this._error_code = 2011
             return 0
         }
         var tuple = this._order.whatIsNotFilled()
