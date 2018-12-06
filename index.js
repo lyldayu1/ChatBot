@@ -146,6 +146,7 @@ function insertOrder(UID,Time,Quantity,FoodType,Price,Options){
   }else{
     console.log("in insertOrder(): Connected!")
     var sql="INSERT INTO Orders (UID,Time, Quantity,FoodType,Price,Options) VALUE ("+UID+","+Time+","+Quantity+","+FoodType+","+Price+",'"+Options+"')";
+    console.log(sql);
     con.query(sql,function(err,result){
       con.release();
       if(err){
@@ -321,6 +322,11 @@ app.post('/webhook', (req, res) => {
 
             let responseTuple = responseRobot.converse(entities, text)
             let responseText = responseTuple.text
+	    if (responseRobot._error_code == 2011)
+	    {
+	      sendImageMessage(sender, "./Menu.png");
+	      return;
+	    }
             console.log(responseRobot.stage)
             sendTextMessage(sender, responseText)
             if(responseRobot.stage == 999){
