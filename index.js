@@ -322,12 +322,13 @@ app.post('/webhook', (req, res) => {
 
             let responseTuple = responseRobot.converse(entities, text)
             let responseText = responseTuple.text
+	    console.log(responseRobot._error_code)
+	    console.log(responseRobot.stage)
 	    if (responseRobot._error_code == 2011)
 	    {
 	      sendImageMessage(sender, "./Menu.png");
 	      return;
 	    }
-            console.log(responseRobot.stage)
             sendTextMessage(sender, responseText)
             if(responseRobot.stage == 999){
               restartFlag = 1
