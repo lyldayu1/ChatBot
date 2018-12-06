@@ -327,6 +327,7 @@ app.post('/webhook', (req, res) => {
 	    if (responseRobot._error_code == 2011)
 	    {
 	      sendImageMessage(sender, "./Menu.png");
+	      responseRobot._error_code = 0
 	      return;
 	    }
             sendTextMessage(sender, responseText)
