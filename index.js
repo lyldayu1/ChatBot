@@ -567,6 +567,14 @@ app.get('/style/style.css', (req, res) => {
     res.sendFile(__dirname + '/page/style/style.css');
 });
 
+app.get('/WatrixMain.png', (req, res) => {
+    res.sendFile(__dirname + '/WatrixMain.png');
+});
+
+app.get('/Team.png', (req, res) => {
+    res.sendFile(__dirname + '/Team.png');
+});
+
 
 app.get('/test', (req, res) => {
     //res.send("test successed!");
