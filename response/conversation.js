@@ -287,7 +287,7 @@ class Conversation {
         // TOTAL PRICE
         text += "Total: $" + total_price.toFixed(2) + "\n"
         // TOGO FORHERE
-        if (this._order._togo == true) {
+        if (this._togo == true) {
             text += "Togo \n"
         } else {
             text += "Dine-in \n"
