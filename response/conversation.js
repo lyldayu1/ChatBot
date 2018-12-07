@@ -288,7 +288,7 @@ class Conversation {
         text += "Total: $" + total_price.toFixed(2) + "\n"
         // TOGO FORHERE
         if (this._togo == true) {
-            text += "Togo \n"
+            text += "To go \n"
         } else {
             text += "Dine-in \n"
         }
@@ -296,7 +296,7 @@ class Conversation {
         if (this._special_inst_text != "") {
             text += "Note: " + this._special_inst_text + "\n"
         }
-        text += "Hope you enjoy the order. Have a nice day!\n"
+        text += "Enjoy the order. Have a nice day!\n"
         text += "To start a new session, simply greet me!" 
         return text
     }
