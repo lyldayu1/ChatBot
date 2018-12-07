@@ -12,19 +12,24 @@
  *     9: completed
  * B = 0: making order
  *     1: making reservation
- *     2: request restaurant info
+ *     2: request restaurant info (not used)
  *     3: recording feedback
- * C = 1: determining main attribute (food type for order)
- *     2: determining additional info (onions, cheese, etc.)
- *     3: dish / reservation confirmation
- *     9: ask if anything else
+ * C = (If A == 2)
+ *       1: determining main attribute (food type for order)
+ *       2: determining additional info (onions, cheese, etc.)
+ *       3: dish / reservation confirmation (not used)
+ *       9: ask if anything else
+ *     (If A == 3)
+ *       1: determining additional order info (sauces, etc.)
+ *       2: determining for here / togo
+ *       3: print out order info and end session
  * all valid_stages = new Set([
  *     101, 102,            // greeting
  *     201, 202, 203, 209,  // ordering
  *     211, 212, 213, 219,  // reservation
  *     221, 222, 223, 229,  // info
  *     231, 232, 233, 239,  // feedback
- *     301, 302,            // confirmation
+ *     301, 302, 303        // confirmation
  *     999])                // completed
  */
 
@@ -84,6 +89,10 @@ const BOT_CONFUSED = [
     "Sorry, I am confused.",
     "Sorry, I didn't get that."
 ]
+const ERROR_MSG = {
+    0: "",
+    2011: "We don't have this food, here is our menu:",
+}
 
 
 class ReturnTuple {
@@ -105,6 +114,8 @@ class Conversation {
      *      Restaurant class object (info_restaurant.js)
      *  @param {object} this._order:
      *      Order class object (info_order.js)
+     *  @param {object} this._togo:
+     *      Flag if this is a togo order
      *  @param {integer} this._dishno:
      *      Current dish index for this._order.dishlist
      *  @param {object} this._reservation:
@@ -119,6 +130,8 @@ class Conversation {
      *      Flag if multiple dishes in dishlist
      *  @param {integer} this._bot_confused:
      *      Flag if bot is confused
+     *  @param {integer} this._error_code:
+     *      Error code of the current conversaion
      */
 
     constructor() {
@@ -134,6 +147,7 @@ class Conversation {
         this._special_inst_text = ""
         this._multiple_dish_flag = false
         this._bot_confused = false
+        this._error_code = 0
     }
 
     print() {
@@ -154,7 +168,7 @@ class Conversation {
          * @param {String} text:
          *      Text message.
          * 
-         * @return {(Integer, String)}:
+         * @return {ReturnTuple}:
          *      Status code and the response text from _converse().
          *      Will return status code -1 if this.stage == 999.
          */
@@ -178,7 +192,7 @@ class Conversation {
          * @param {String} text:
          *      Text message.
          * 
-         * @return {(Integer, String)}:
+         * @return {ReturnTuple}:
          *      Status code and the response text.
          */
         this._current_text = text
@@ -201,9 +215,16 @@ class Conversation {
             console.log("ERROR: converse_ps functions return non-zero.")
             this._bot_confused == true
         }
+        // Reset confused status
         if (this._bot_confused == true) {
+            var tuple = new ReturnTuple(
+                1,
+                randomArrayPicker(BOT_CONFUSED) + " " +
+                    ERROR_MSG[this._error_code]
+            )
             this._bot_confused = false
-            return new ReturnTuple(1, randomArrayPicker(BOT_CONFUSED))
+            return tuple
+            
         }
         primary_stage = Math.floor(this.stage / 100)
         var signal = 0
@@ -236,6 +257,7 @@ class Conversation {
     }
 
     _conversationReport() {
+        /* Return the order summary if called */
         // ORDER_REITERATE
         var text = randomArrayPicker(ORDER_CONFIRM) + "\n"
         var total_price = 0
@@ -243,8 +265,11 @@ class Conversation {
         for (var i = 0; i < this._order.dishlist.length; i ++) {
             var temp_text = ""
             var food = this._order.dishlist[i]
+            console.log("Print result: " + food.print());
             var primary_type = food.type
+            console.log("primary type: " + primary_type.toString())
             var secondary_type = food.food_type
+            console.log("secondary type: " + secondary_type.toString())
             var price_chart = this._restaurant._prices
             if (primary_type == "Burger") {
                 temp_text = price_chart[secondary_type]
@@ -260,7 +285,7 @@ class Conversation {
                     food.customerReport() + "\n"
         }
         // TOTAL PRICE
-        text += "Total: $" + total_price + "\n"
+        text += "Total: $" + total_price.toFixed(2) + "\n"
         // TOGO FORHERE
         if (this._order._togo == true) {
             text += "Togo \n"
@@ -271,12 +296,14 @@ class Conversation {
         if (this._special_inst_text != "") {
             text += "Note: " + this._special_inst_text + "\n"
         }
-	text += "Session Ends. Bye!"
+        text += "Hope you enjoy the order. Have a nice day!\n"
+        text += "To start a new session, simply greet me!" 
         return text
     }
 
     _converse_ps1(recv) {
-        if (ORDER in recv) {
+        /* understanding workflow in primary stage 1 */
+        if ((ORDER in recv) || ("food_type" in recv)) {
             // Make order (201 - 203, 209)
             // 201 = Require food type
             // 202 = Require additional info
@@ -332,6 +359,7 @@ class Conversation {
     }
 
     _converse_ps2(recv) {
+        /* understanding workflow in primary stage 2 */
         var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
         if (secondary_stage == 0) {
@@ -350,13 +378,13 @@ class Conversation {
             // Make reservation (211 - 213, 219)
             // 212 = Require additional info
             // 213 = Require confirmation
-            // 209 = Ask if anything else
+            // 219 = Ask if anything else
             this._reservation.fill(recv)
             var res = this._reservation.whatIsNotFilled()
             if (res != 0) {
                 this.stage = 212
             } else {
-                this.stage = 213
+                this.stage = 311
             }
             return 0
         } else if (secondary_stage == 2) {
@@ -377,25 +405,35 @@ class Conversation {
     }
 
     _converse_ps3(recv) {
+        /* understanding workflow in primary stage 3 */
+        var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
-        if (progress_stage == 1) {
-            return this._converse_s301(recv)
-        } else if (progress_stage == 2) {
-            return this._converse_s302(recv)
-        } else if (progress_stage == 3) {
-            return this._converse_s303(recv)
-        } else {
-            // Bot is confused, stage stays at the current stage
-            this._bot_confused = true
-            return 0
+        if (secondary_stage == 0) {
+            if (progress_stage == 1) {
+                return this._converse_s301(recv)
+            } else if (progress_stage == 2) {
+                return this._converse_s302(recv)
+            } else if (progress_stage == 3) {
+                return this._converse_s303(recv)
+            } else {
+                // Bot is confused, stage stays at the current stage
+                this._bot_confused = true
+                return 0
+            }
+        } else if (secondary_stage == 1) {
+            if (progress_stage == 1) {
+                return this._converse_s311(recv)
+            }
         }
     }
 
     _converse_s201(recv) {
+        /* understanding workflow in stage 201 */
         var res = 0
         res = this._order.addFill(recv)
         if (res == 1) {
             this._bot_confused = true
+            this._error_code = 2011
             return 0
         }
         var tuple = this._order.whatIsNotFilled()
@@ -410,6 +448,7 @@ class Conversation {
     }
 
     _converse_s202(recv) {
+        /* understanding workflow in stage 202 */
         this._order.fill(this._dishno, recv)
         var tuple = this._order.whatIsNotFilled()
         var index = tuple.index
@@ -423,6 +462,7 @@ class Conversation {
     }
 
     _converse_s209(recv) {
+        /* understanding workflow in stage 209 */
         var yn = this._yn_parsing(recv)
         if (yn == 0) {
             // Only when explicitly declaring NO
@@ -481,6 +521,7 @@ class Conversation {
     }
 
     _converse_s301(recv) {
+        /* understanding workflow in stage 301 */
         // Special instruction
         var yn = this._yn_parsing(recv)
         if (yn == 1) {
@@ -492,29 +533,38 @@ class Conversation {
     }
 
     _converse_s302(recv) {
+        /* understanding workflow in stage 302 */
         // For here or togo
 		if (FORTOGO in recv) {
-			this._togo = true
+            this._togo = true
+            this.stage = 999
 		} else if (FORHERE in recv) {
-			this._togo = false
+            this._togo = false
+            this.stage = 999
 		} else {
 			this._bot_confused = true
 		}
-		this.stage = 999
         return 0
     }
 
     _converse_s303(recv) {
-		// Print order
+        /* understanding workflow in stage 303 */
+        // Nothing to do here, advance to stage 999
 		this.stage = 999
         return 0
     }
 
-    _response_ps1() {
+    _converse_s311(recv) {
+        
+    }
+
+    _response_ps1(recv) {
+        /* understanding workflow in primary stage 1 */
         return new ReturnTuple(0, "")
     }
 
     _response_ps2(recv) {
+        /* understanding workflow in primary stage 2 */
         var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
         if (secondary_stage == 0) {
@@ -551,21 +601,34 @@ class Conversation {
             return _feedback_resp_module(
                 progress_stage
             )
+        } else {
+            console.log("ERROR: In _response_ps2(), invalid progress stage number.")
+            return -1   
         }
     }
 
     _response_ps3(recv) {
+        /* understanding workflow in primary stage 3 */
+        var secondary_stage = Math.floor(this.stage / 10) % 10
         var progress_stage = this.stage % 10
-        if (progress_stage == 1) {
-            return new ReturnTuple(0, randomArrayPicker(SPECIAL_INST))
-        } else if(progress_stage == 2) {
-            return new ReturnTuple(0, randomArrayPicker(TOGO))
-        } //else if (progress_stage == 3) {
-
-        //}
+        if (secondary_stage == 0) {
+            if (progress_stage == 1) {
+                return new ReturnTuple(0, randomArrayPicker(SPECIAL_INST))
+            } else if(progress_stage == 2) {
+                return new ReturnTuple(0, randomArrayPicker(TOGO))
+            } else {
+                console.log("ERROR: In _response_ps3(), invalid progress stage number.")
+                return -1
+            }
+        } else if (secondary_stage == 1) {
+            if (progress_stage == 1) {
+                return new ReturnTuple(0, this._reservation.customerReport())
+            }
+        }
     }
 
     _yn_parsing(recv) {
+        /* parse positive and negative response in recv */
         // Case 1: yn in size_type
         if (SIZE_LIST in recv) {
             if (recv.size_type[0].value == YES) {
@@ -612,14 +675,18 @@ class Conversation {
                 }
             }
         }
-        // This happens, but I consider this as a bad practise
+        // This happens, but I consider this to be a bad practise
         // return -1 if conversationEnd or size_type not in recv
         return -1
     }
 
     renew() {
+        /* Conversation instance in index.js is considered a singleton
+         * As such, a renew method is here to return a new instance
+         */
         return new Conversation();
     }
 }
 
+// Module Export
 module.exports = new Conversation()

@@ -30,14 +30,14 @@ const findOrCreateSession = (fbid) => {
     sessionId = new Date().toISOString();
     sessions[sessionId] = {fbid: fbid, context: {}};
     // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    sendTextMessage(fbid, "Hi. This is WaitriX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
   if(sessionId && flag === 0 && restartFlag === 1)
   {
     flag = 1
     // Send the first message to user
-    sendTextMessage(fbid, "Hi. This is WaitressX. What can I do for you today?")
+    sendTextMessage(fbid, "Hi. This is WaitriX. What can I do for you today?")
     console.log("sender: " + fbid)
   }
   return sessionId;
@@ -146,6 +146,7 @@ function insertOrder(UID,Time,Quantity,FoodType,Price,Options){
   }else{
     console.log("in insertOrder(): Connected!")
     var sql="INSERT INTO Orders (UID,Time, Quantity,FoodType,Price,Options) VALUE ("+UID+","+Time+","+Quantity+","+FoodType+","+Price+",'"+Options+"')";
+    console.log(sql);
     con.query(sql,function(err,result){
       con.release();
       if(err){
@@ -296,7 +297,7 @@ app.post('/webhook', (req, res) => {
               }
               return;
             }
-            else if (entities.give_recommendation!=null){
+            else if (entities.give_recommendation != null) {
               queryRecommendation(function(result) {
                 var recommendations = result;
                 var message = "Today's speciality(s): \n";
@@ -310,11 +311,26 @@ app.post('/webhook', (req, res) => {
               });
               return;
             }
+            else if (entities.restart != null) {
+              console.log("Restart");
+              responseRobot = responseRobot.renew();
+              flag = 0;
+              restartFlag = 1;
+              sendTextMessage(sender, "Server has restarted. Please greet the bot to start over.");
+              return
+            }
 
-            let reponseTuple = responseRobot.converse(entities, text)
-            let reponseText = reponseTuple.text
-            console.log(responseRobot.stage)
-            sendTextMessage(sender, reponseText)
+            let responseTuple = responseRobot.converse(entities, text)
+            let responseText = responseTuple.text
+	    console.log(responseRobot._error_code)
+	    console.log(responseRobot.stage)
+            sendTextMessage(sender, responseText)
+	    if (responseRobot._error_code == 2011)
+	    {
+	      sendImageMessage(sender, "./Menu.png");
+	      responseRobot._error_code = 0
+	      return;
+	    }
             if(responseRobot.stage == 999){
               restartFlag = 1
               let resultTuple = responseRobot._order.whatIsNotFilled()
@@ -322,14 +338,9 @@ app.post('/webhook', (req, res) => {
                 let e=responseRobot._order.dishlist
                 for(i=0;i<e.length;i++){
                   if(e[i].type=='Burger'){
-                    if(e[i].if_combo==1){
                       let burgerName=e[i].food_type;
-                      let comboName=burgerName+" Combo";
-                      insertOrder(sender,sqltimestamp,1,indexs[comboName],prices[comboName],'');
-                    }else{
-                      let burgerName=e[i].food_type;
+		      console.log("burgerName: " + burgerName)
                       insertOrder(sender,sqltimestamp,1,indexs[burgerName],prices[burgerName],'');
-                    }
                   }else if(e[i].type=='Fries'){
                     insertOrder(sender,sqltimestamp,1,3,1.6,'');
                   }else if(e[i].type=='Drink'){
