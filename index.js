@@ -579,11 +579,11 @@ app.get('/style/style.css', (req, res) => {
 });
 
 app.get('/WatrixMain.png', (req, res) => {
-    res.sendFile(__dirname + '/WatrixMain.png');
+    res.sendFile(__dirname + '/page/WatrixMain.png');
 });
 
 app.get('/Team.png', (req, res) => {
-    res.sendFile(__dirname + '/Team.png');
+    res.sendFile(__dirname + '/page/Team.png');
 });
 
 
